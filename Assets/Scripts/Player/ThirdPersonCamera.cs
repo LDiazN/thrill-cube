@@ -3,7 +3,9 @@ using System.ComponentModel;
 using System.Drawing;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Color = UnityEngine.Color;
 
+[RequireComponent(typeof(PlayerMovement))]
 public class ThirdPersonCamera : MonoBehaviour
 {
     #region Inspector Properties
@@ -18,6 +20,7 @@ public class ThirdPersonCamera : MonoBehaviour
 
     [Description("Target used for the third person follow camera")]
     [SerializeField] private GameObject followTarget;
+    public GameObject FollowTarget => followTarget;
 
     #endregion
 
@@ -39,17 +42,26 @@ public class ThirdPersonCamera : MonoBehaviour
     /// </summary>
     private Vector3 _originalOffset;
 
+    private PlayerMovement _playerMovement;
+    
     #endregion
+
+    private void Awake()
+    {
+        _playerMovement = GetComponent<PlayerMovement>();
+    }
 
     private void Start()
     {
         _originalOffset = playerCamera.transform.localPosition;
     }
 
-    private void Update()
+    // Called by player movement component in fixed update
+    public void UpdateThirdPersonCamera()
     {
         UpdateCameraRotation();
         UpdateCameraTilt();
+        UpdatePlayerLookDirection();
     }
 
     private void UpdateCameraRotation()
@@ -78,4 +90,28 @@ public class ThirdPersonCamera : MonoBehaviour
         
         followTarget.transform.localEulerAngles = angles;
     }
+
+    private void UpdatePlayerLookDirection()
+    {
+        // project camera target forward direction to know where the player 
+        // should be looking at
+        var direction = followTarget.transform.forward;
+        direction.y = 0;
+        direction.Normalize();
+        _playerMovement.LookDirection = direction;
+    }
+
+    /// <summary>
+    /// A vector pointing in the direction of the camera
+    /// </summary>
+    public Vector3 GetCameraDirection()
+    {
+        return Camera.main.transform.forward;
+    }
+
+    public Vector3 GetCameraPosition()
+    {
+        return Camera.main.transform.position;
+    }
+
 }

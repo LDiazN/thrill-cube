@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(PlayerMovement), typeof(ThirdPersonCamera))]
+[RequireComponent(typeof(PlayerMovement), typeof(ThirdPersonCamera), typeof(Shoot))]
 public class PlayerInputController : MonoBehaviour
 {
     
@@ -16,6 +16,7 @@ public class PlayerInputController : MonoBehaviour
     // -- Components ----------------------------------
     private PlayerMovement _playerMovement;
     private ThirdPersonCamera _tpCamera;
+    private Shoot _shoot;
 
     #endregion
 
@@ -23,13 +24,15 @@ public class PlayerInputController : MonoBehaviour
     {
         _playerMovement = GetComponent<PlayerMovement>();
         _tpCamera = GetComponent<ThirdPersonCamera>();
+        _shoot = GetComponent<Shoot>();
     }
 
     void Start()
     {
         _movementAction = InputSystem.actions.FindAction("Move");
         _lookAction = InputSystem.actions.FindAction("Look");
-        _attackAction = InputSystem.actions.FindAction("Jump");
+        _attackAction = InputSystem.actions.FindAction("Attack");
+        _attackAction.performed += UpdateShoot;
     }
 
     void Update()
@@ -56,5 +59,11 @@ public class PlayerInputController : MonoBehaviour
         Vector3 movementDirection = new Vector3(movementInput.x, 0, movementInput.y);
         movementDirection.Normalize();
         return movementDirection;
+    }
+
+    void UpdateShoot(InputAction.CallbackContext context)
+    {
+        Debug.Log("Shooting!");
+        _shoot.Fire();
     }
 }
