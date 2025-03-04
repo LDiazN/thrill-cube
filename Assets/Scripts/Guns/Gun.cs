@@ -29,7 +29,6 @@ public class Gun : MonoBehaviour
 
     public void Fire(Vector3 target)
     {
-        Debug.Log("Bang bang!");
         if (timeSinceLastShot < fireRate)
             return;
         

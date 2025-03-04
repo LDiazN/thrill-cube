@@ -114,4 +114,9 @@ public class ThirdPersonCamera : MonoBehaviour
         return Camera.main.transform.position;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(GetCameraPosition(), GetCameraPosition() + 1000 * GetCameraDirection());
+    }
 }

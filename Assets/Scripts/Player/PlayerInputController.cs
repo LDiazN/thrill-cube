@@ -63,7 +63,6 @@ public class PlayerInputController : MonoBehaviour
 
     void UpdateShoot(InputAction.CallbackContext context)
     {
-        Debug.Log("Shooting!");
         _shoot.Fire();
     }
 }

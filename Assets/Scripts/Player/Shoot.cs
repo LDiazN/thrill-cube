@@ -25,7 +25,6 @@ public class Shoot : MonoBehaviour
         if (Weapon == null)
             return;
 
-        Debug.Log("Bang bang!");
         var gunComponent = Weapon.GetComponent<Gun>();
         Debug.Assert(gunComponent !=null, "A gun should always have a gun component");
         
@@ -34,7 +33,21 @@ public class Shoot : MonoBehaviour
 
     private Vector3 GetTarget()
     {
+        // Try to shoot at  target very far away. If you find something else first, shoot at that 
+        var hitSomething = Physics.Raycast(_tpsCamera.GetCameraPosition(), _tpsCamera.GetCameraDirection(), out RaycastHit hit);
+        if (hitSomething) 
+            return hit.point;
+        
+        // Didn't find anything, shoot at the infinite void
         return _tpsCamera.GetCameraPosition() + 1000 * _tpsCamera.GetCameraDirection();
     }
 
+    private void OnDrawGizmos()
+    {
+        if (_tpsCamera == null)
+            return;
+        
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(GetTarget(), 1);
+    }
 }

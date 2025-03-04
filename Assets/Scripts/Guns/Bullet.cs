@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using UnityEngine;
 
@@ -11,15 +12,21 @@ public class Bullet : MonoBehaviour
     
     #endregion
 
-    private void Update()
+    private void FixedUpdate()
     {
-        var translation = maxSpeed * maxSpeed * Time.deltaTime * transform.forward;
-        transform.Translate(translation);     
+        var translation = maxSpeed * Time.deltaTime * transform.forward;
+        transform.Translate(translation, Space.World);     
     }
 
     private void OnCollisionEnter(Collision other)
     {
         Debug.Log("Collided!");
         Destroy(gameObject);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward);
     }
 }
