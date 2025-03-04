@@ -1,6 +1,9 @@
+using System;
 using System.ComponentModel;
+using Unity.Cinemachine;
 using UnityEngine;
 
+[RequireComponent(typeof(CinemachineImpulseSource))]
 public class Gun : MonoBehaviour
 {
     #region Inspector Properties
@@ -18,9 +21,18 @@ public class Gun : MonoBehaviour
     private Transform bulletSpawnPoint;
     #endregion
 
+    #region Components 
+    CinemachineImpulseSource _impulseSource;
+    #endregion
+    
     #region Internal State 
     private float timeSinceLastShot;
     #endregion
+
+    private void Awake()
+    {
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
+    }
 
     private void Update()
     {
@@ -33,12 +45,22 @@ public class Gun : MonoBehaviour
             return;
         
         timeSinceLastShot = 0;
+        SpawnBullet(target);
+        ScreenShake();
+    }
 
+    private void SpawnBullet(Vector3 target)
+    {
         var direction = target - bulletSpawnPoint.position;
         direction.Normalize();
         
         var bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
         bullet.transform.LookAt(target);
-        
+    }
+
+    private void ScreenShake()
+    {
+        if (Camera.main != null)
+            _impulseSource.GenerateImpulse(Vector3.forward);        
     }
 }
