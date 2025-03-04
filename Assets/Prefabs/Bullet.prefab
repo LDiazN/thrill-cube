@@ -272,6 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 20
+  destroyParticles: {fileID: 6995799823304382606, guid: f5f05794c069faa4a9f5f7ee95b187af, type: 3}
 --- !u!54 &8380237957234542885
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -291,7 +292,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
