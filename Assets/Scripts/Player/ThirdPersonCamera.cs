@@ -21,6 +21,9 @@ public class ThirdPersonCamera : MonoBehaviour
     [Description("Target used for the third person follow camera")]
     [SerializeField] private GameObject followTarget;
     public GameObject FollowTarget => followTarget;
+    
+    [Description("How much to tilt the camera to emulate head movement on horizontal movement")]
+    [SerializeField] private float maxTiltAngle = 10;
 
     #endregion
 
@@ -43,6 +46,8 @@ public class ThirdPersonCamera : MonoBehaviour
     private Vector3 _originalOffset;
 
     private PlayerMovement _playerMovement;
+
+    private float _tiltSmoothVelocity = 0;
     
     #endregion
 
@@ -62,6 +67,7 @@ public class ThirdPersonCamera : MonoBehaviour
         UpdateCameraRotation();
         UpdateCameraTilt();
         UpdatePlayerLookDirection();
+        UpdateHeadTilt();
     }
 
     private void UpdateCameraRotation()
@@ -118,5 +124,13 @@ public class ThirdPersonCamera : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(GetCameraPosition(), GetCameraPosition() + 1000 * GetCameraDirection());
+    }
+
+    private void UpdateHeadTilt()
+    {
+        var rotation = followTarget.transform.rotation.eulerAngles;
+        var desiredRotation = - _playerMovement.MovementDirection.x * maxTiltAngle;
+        rotation.z = Mathf.SmoothDamp(rotation.z, desiredRotation, ref _tiltSmoothVelocity, 0.2f);
+        followTarget.transform.rotation = Quaternion.Euler(rotation);
     }
 }
