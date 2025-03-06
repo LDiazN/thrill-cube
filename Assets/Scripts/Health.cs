@@ -26,6 +26,8 @@ public class Health : MonoBehaviour
 
     #region Internal State
 
+    // We only serialize it to see it in inspector
+    [SerializeField]
     int _currentHealth;
 
     /// <summary>
