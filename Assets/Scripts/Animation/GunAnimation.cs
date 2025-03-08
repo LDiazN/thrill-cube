@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Gun), typeof(Animator))]
@@ -17,7 +18,12 @@ public class GunAnimation : MonoBehaviour
 
     private void Start()
     {
-        _gun.OnShoot += (TriggerShootingAnimation);
+        _gun.OnShoot += TriggerShootingAnimation;
+    }
+
+    private void OnDisable()
+    {
+        _gun.OnShoot -= TriggerShootingAnimation;
     }
 
     private void TriggerShootingAnimation()

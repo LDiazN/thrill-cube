@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.ComponentModel;
 using DG.Tweening;
+using System;
 
 [RequireComponent(typeof(Health), typeof(MeshRenderer), typeof(Rigidbody))]
 public class Enemy : MonoBehaviour
@@ -27,6 +28,11 @@ public class Enemy : MonoBehaviour
     Queue<Vector3> _forceRequests = new();
     #endregion
 
+    #region Callbacks
+
+    public event Action OnJustDied;
+    
+    #endregion
 
     private void Awake()
     {
@@ -38,6 +44,11 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         _health.OnHealthChanged += OnHurt;
+    }
+
+    private void OnDisable()
+    {
+        _health.OnHealthChanged -= OnHurt;
     }
 
     /// <summary>
@@ -65,7 +76,10 @@ public class Enemy : MonoBehaviour
         transform.DOScale(newScale, 1f).OnComplete(
             () => { _renderer.material = _deadEnemyMaterial;}
         ).Play();
-
+        
+        // Report this enemy as dead
+        if (change.IsDamage)
+            OnJustDied?.Invoke(); 
     }
 
     private void OnHurt(Health health, Health.Change change)
@@ -77,6 +91,7 @@ public class Enemy : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Apply all enqueued force requests
         while (_forceRequests.Count > 0)
         {
             var force = _forceRequests.Dequeue();

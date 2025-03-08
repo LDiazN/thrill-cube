@@ -48,6 +48,8 @@ public class Health : MonoBehaviour
 
         public bool IsDamage => offset < 0;
         public bool IsHeal => knockback > 0;
+
+        public bool JustDied(Health health) => offset < 0 && health.isDead;
     }
 
     private void Awake()
@@ -68,5 +70,11 @@ public class Health : MonoBehaviour
     {
         // Heal is just negative damage
         TakeDamage(-healAmount);
+    }
+
+    [ContextMenu("Test Hurt")]
+    public void TestHurt()
+    {
+        TakeDamage(1);
     }
 }

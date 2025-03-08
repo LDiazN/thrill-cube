@@ -35,6 +35,11 @@ public class PlayerInputController : MonoBehaviour
         _attackAction.performed += UpdateShoot;
     }
 
+    private void OnDisable()
+    {
+        _attackAction.performed -= UpdateShoot;
+    }
+
     void Update()
     {
         UpdatePlayerMovement();

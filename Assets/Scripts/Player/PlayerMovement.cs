@@ -39,6 +39,8 @@ public class PlayerMovement : MonoBehaviour
         set => _lookDirection = value;
     }
 
+    private bool _canMove = true;
+    public bool CanMove { get => _canMove; set => _canMove = value; }
     #endregion
 
     private void Awake()
@@ -75,6 +77,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
+        if (!_canMove)
+            return;
+        
         var movement = _movementDirection.z * maxSpeed * transform.forward +
                        _movementDirection.x * maxSpeed * transform.right;
         _rigidbody.linearVelocity = movement;

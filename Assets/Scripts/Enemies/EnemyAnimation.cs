@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator), typeof(Health))]
@@ -17,6 +18,11 @@ public class EnemyAnimation : MonoBehaviour
     private void Start()
     {
         _health.OnHealthChanged += OnHurt;
+    }
+
+    private void OnDisable()
+    {
+        _health.OnHealthChanged -= OnHurt;
     }
 
     private void OnHurt(Health health, Health.Change change)
