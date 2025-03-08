@@ -97,6 +97,8 @@ GameObject:
   - component: {fileID: 8171562264088565204}
   - component: {fileID: 6973782839040076689}
   - component: {fileID: 3206965967334994735}
+  - component: {fileID: 3212385972228515569}
+  - component: {fileID: 1823648578542419800}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -137,6 +139,8 @@ MonoBehaviour:
   fireRate: 0.25
   bulletPrefab: {fileID: 4583260921117651165, guid: eb3a68476d5721942ae49c73d5bcfc2f, type: 3}
   bulletSpawnPoint: {fileID: 1101712839139967355}
+  knockBackForce: 1
+  knockBackForceOnDead: 20
 --- !u!114 &3206965967334994735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,6 +194,40 @@ MonoBehaviour:
     DissipationDistance: 100
     PropagationSpeed: 343
   DefaultVelocity: {x: 0, y: -1, z: 0}
+--- !u!95 &3212385972228515569
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6445032975453214688}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b64ef94d7686baa48bc22e0d0c97850c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1823648578542419800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6445032975453214688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 552a7f626c29c8d479a63e3fff790aec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6467386770124417962
 GameObject:
   m_ObjectHideFlags: 0

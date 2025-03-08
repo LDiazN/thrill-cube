@@ -4,16 +4,19 @@ using System.ComponentModel;
 using DG.Tweening;
 
 [RequireComponent(typeof(Health), typeof(MeshRenderer), typeof(Rigidbody))]
-public class EnemyAIController : MonoBehaviour
+public class Enemy : MonoBehaviour
 {
     #region Inspector Properties
 
+    [Header("Visuals")]
+    
     [Description("Used when the enemy is dead")]
     [SerializeField] private Material _deadEnemyMaterial;
 
     [Description("A multiplier added to the knockback of an enemy, to make it more heavy or light")]
     [Min(0)]
     [SerializeField] private float _knockbackMultiplier = 1;
+    
     #endregion
     
     #region Internal State

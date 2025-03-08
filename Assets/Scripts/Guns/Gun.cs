@@ -11,6 +11,7 @@ public class Gun : MonoBehaviour
     [Description("How many seconds to wait between shots")]
     [SerializeField]
     private float fireRate = 0.5f;
+    public float FireRate => fireRate;
     
     [Description("Object to spawn when shooting this weapon")]
     [SerializeField]
@@ -31,6 +32,11 @@ public class Gun : MonoBehaviour
     CinemachineImpulseSource _impulseSource;
     #endregion
     
+    #region Callbacks
+
+    public event Action OnShoot;
+    
+    #endregion 
     #region Internal State 
     private float _timeSinceLastShot;
     #endregion
@@ -53,6 +59,8 @@ public class Gun : MonoBehaviour
         _timeSinceLastShot = 0;
         SpawnBullet(target);
         ScreenShake();
+        
+        OnShoot?.Invoke();
     }
 
     private void SpawnBullet(Vector3 target)
