@@ -20,7 +20,7 @@ public class Health : MonoBehaviour
     ///     - Health offset (negative means damage, positive means healing)
     ///     - Hit direction, in case of hit
     /// </summary>
-    public event Action<Health, int, Vector3> OnHealthChanged;
+    public event Action<Health, Change> OnHealthChanged;
 
     #endregion
 
@@ -39,18 +39,29 @@ public class Health : MonoBehaviour
 
     #endregion
 
+    public struct Change
+    {
+        public float offset;
+        public Vector3 direction;
+        public float knockback;
+        public float knockbackOnDead;
+
+        public bool IsDamage => offset < 0;
+        public bool IsHeal => knockback > 0;
+    }
+
     private void Awake()
     {
         _currentHealth = _maxHealth;
     }
 
-    public void TakeDamage(int damage, Vector3 hitDirection = new Vector3())
+    public void TakeDamage(int damage, Vector3 hitDirection = new Vector3(), float knockback = 0f, float knockbackOnDead = 0f)
     {
         var newHealth = Mathf.Clamp(_currentHealth - damage, 0, _maxHealth);
         var offset = newHealth - CurrentHealth;
         _currentHealth = newHealth;
         
-        OnHealthChanged?.Invoke(this, offset, hitDirection);
+        OnHealthChanged?.Invoke(this, new Change{direction = hitDirection, offset = offset, knockback = knockback, knockbackOnDead = knockbackOnDead});
     }
 
     public void Heal(int healAmount)

@@ -19,10 +19,20 @@ public class Bullet : MonoBehaviour
     
     #endregion
     
-    #region Inspector Variables
+    #region Components
     Rigidbody _rigidbody;
     Collider _collider;
     #endregion
+    
+    #region Internal State
+
+    [HideInInspector]
+    public float knockBackForce = 1;
+    
+    [HideInInspector]
+    public float knockBackForceOnDead = 20;
+
+    #endregion 
 
     private void Awake()
     {
@@ -45,7 +55,7 @@ public class Bullet : MonoBehaviour
         // Check if you can hurt the other entity
         var health = other.gameObject.GetComponent<Health>();
         if (health != null)
-            health.TakeDamage(damage, transform.forward);
+            health.TakeDamage(damage, transform.forward, knockBackForce, knockBackForceOnDead);
         
         // Start animation and destroy this bullet
         transform.DOScale(Vector3.zero, 0.1f).OnComplete(() => Destroy(gameObject)).Play();

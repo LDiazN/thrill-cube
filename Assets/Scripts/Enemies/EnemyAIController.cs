@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using DG.Tweening;
 
-[RequireComponent(typeof(Health), typeof(MeshRenderer))]
+[RequireComponent(typeof(Health), typeof(MeshRenderer), typeof(Rigidbody))]
 public class EnemyAIController : MonoBehaviour
 {
     #region Inspector Properties
@@ -32,32 +32,39 @@ public class EnemyAIController : MonoBehaviour
         _health.OnHealthChanged += OnHurt;
     }
 
-    private void OnDead(Health health, int offset, Vector3 direction)
+    /// <summary>
+    /// Called when you shoot a dead enemy (just died or already dead)
+    /// </summary>
+    /// <param name="health">Affected heatlh component</param>
+    /// <param name="change">Object specifying the change in health event</param>
+    private void OnDead(Health health, Health.Change change)
     {
         if (!health.isDead)
             return;
         
         _rigidbody.constraints = RigidbodyConstraints.None;
         // When it dies the force is stronger
-        var force = 10;
-        if (offset < 0)
-            force *= 3;
-        if (offset < 0)
-            _forceRequests.Enqueue(direction * force);
+        var force = change.knockback;
+        if (change.IsDamage)
+        {
+            force = change.knockbackOnDead;
+        }
+        _forceRequests.Enqueue(change.direction * force);
         
         // Make it smaller 
         var newScale = transform.localScale;
-        newScale *= 0.1f;
+        newScale *= 0.9f;
         transform.DOScale(newScale, 1f).OnComplete(
             () => { _renderer.material = _deadEnemyMaterial;}
         ).Play();
 
     }
 
-    private void OnHurt(Health health, int offset, Vector3 direction)
+    private void OnHurt(Health health, Health.Change change)
     {
-        _rigidbody.AddForce(7 * direction, ForceMode.Impulse);
-        OnDead(health, offset, direction);
+        // Apply knockback to enemy
+        _rigidbody.AddForce(change.knockback * change.direction, ForceMode.Impulse);
+        OnDead(health, change);
     }
 
     private void FixedUpdate()
@@ -68,6 +75,4 @@ public class EnemyAIController : MonoBehaviour
             _rigidbody.AddForce(force, ForceMode.Impulse);
         }
     }
-    
-    
 }

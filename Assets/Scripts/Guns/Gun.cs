@@ -19,6 +19,12 @@ public class Gun : MonoBehaviour
     [Description("Where to spawn the bullet")]
     [SerializeField]
     private Transform bulletSpawnPoint;
+
+    [Description("Force to apply in the direction of the shot on contact")] [SerializeField]
+    private float knockBackForce = 1;
+    
+    [Description("Force to apply in the direction of the shot when the enemy dies")] [SerializeField]
+    private float knockBackForceOnDead = 20;
     #endregion
 
     #region Components 
@@ -26,7 +32,7 @@ public class Gun : MonoBehaviour
     #endregion
     
     #region Internal State 
-    private float timeSinceLastShot;
+    private float _timeSinceLastShot;
     #endregion
 
     private void Awake()
@@ -36,15 +42,15 @@ public class Gun : MonoBehaviour
 
     private void Update()
     {
-        timeSinceLastShot += Time.deltaTime;
+        _timeSinceLastShot += Time.deltaTime;
     }
 
     public void Fire(Vector3 target)
     {
-        if (timeSinceLastShot < fireRate)
+        if (_timeSinceLastShot < fireRate)
             return;
         
-        timeSinceLastShot = 0;
+        _timeSinceLastShot = 0;
         SpawnBullet(target);
         ScreenShake();
     }
@@ -55,12 +61,21 @@ public class Gun : MonoBehaviour
         direction.Normalize();
         
         var bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
-        bullet.transform.LookAt(target);
+        
+        SetupBullet(bullet, target);
     }
 
     private void ScreenShake()
     {
         if (Camera.main != null)
             _impulseSource.GenerateImpulse(Vector3.forward);        
+    }
+
+    private void SetupBullet(GameObject bullet, Vector3 target)
+    {
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        bulletComponent.knockBackForce  = knockBackForce;
+        bulletComponent.knockBackForceOnDead = knockBackForceOnDead;
+        bullet.transform.LookAt(target);
     }
 }

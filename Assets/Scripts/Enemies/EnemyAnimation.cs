@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator), typeof(Health))]
@@ -20,15 +19,15 @@ public class EnemyAnimation : MonoBehaviour
         _health.OnHealthChanged += OnHurt;
     }
 
-    private void OnHurt(Health health, int offset, Vector3 direction)
+    private void OnHurt(Health health, Health.Change change)
     {
-        if (health.isDead && offset < 0)
+        if (health.isDead && change.IsDamage)
         {
             _animator.SetTrigger(EnemyAnimationParams.Die);
             return;
         }
         
-        if (offset < 0)
+        if (change.IsDamage)
             _animator.SetTrigger(EnemyAnimationParams.Hurt);
     }
 }
