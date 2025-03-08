@@ -4,7 +4,7 @@ using System.ComponentModel;
 using DG.Tweening;
 using System;
 
-[RequireComponent(typeof(Health), typeof(MeshRenderer), typeof(Rigidbody))]
+[RequireComponent(typeof(Health), typeof(Rigidbody))]
 public class Enemy : MonoBehaviour
 {
     #region Inspector Properties
@@ -18,12 +18,15 @@ public class Enemy : MonoBehaviour
     [Min(0)]
     [SerializeField] private float _knockbackMultiplier = 1;
     
+    [SerializeField]
+    MeshRenderer _renderer;
+    
+    
     #endregion
     
     #region Internal State
     Health _health;
     Rigidbody _rigidbody;
-    MeshRenderer _renderer;
     
     Queue<Vector3> _forceRequests = new();
     #endregion
@@ -36,9 +39,8 @@ public class Enemy : MonoBehaviour
 
     private void Awake()
     {
-        _health = GetComponent<Health>();
         _rigidbody = GetComponent<Rigidbody>();
-        _renderer = GetComponent<MeshRenderer>();
+        _health = GetComponent<Health>();
     }
 
     private void Start()
