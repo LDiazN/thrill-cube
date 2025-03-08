@@ -10,7 +10,12 @@ public class EnemyAIController : MonoBehaviour
 
     [Description("Used when the enemy is dead")]
     [SerializeField] private Material _deadEnemyMaterial;
+
+    [Description("A multiplier added to the knockback of an enemy, to make it more heavy or light")]
+    [Min(0)]
+    [SerializeField] private float _knockbackMultiplier = 1;
     #endregion
+    
     #region Internal State
     Health _health;
     Rigidbody _rigidbody;
