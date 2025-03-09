@@ -12,6 +12,7 @@ public partial class WantsToPunchAction : Action
 
     protected override Status OnStart()
     {
+        
         var punchAttack = Punchattack.Value;
         punchAttack.WantsToPunch = true;
         return Status.Success;

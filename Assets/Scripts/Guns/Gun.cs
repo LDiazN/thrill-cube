@@ -39,6 +39,7 @@ public class Gun : MonoBehaviour
     #endregion 
     #region Internal State 
     private float _timeSinceLastShot;
+    public bool IsOnRecoil => _timeSinceLastShot < fireRate;
     #endregion
 
     private void Awake()
@@ -93,5 +94,4 @@ public class Gun : MonoBehaviour
         bullet.transform.LookAt(target);
     }
     
-    private bool OnRecoil => _timeSinceLastShot < fireRate;
 }

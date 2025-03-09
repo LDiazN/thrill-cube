@@ -9,6 +9,9 @@ public class RangeDetector : MonoBehaviour
 {
     #region Inspector Properties
 
+    [Description("Just an editor name to know what this detector does")]
+    public string name;
+
     [Description("Player to check for range")] [SerializeField]
     private Player player;
     public Player Player => player;

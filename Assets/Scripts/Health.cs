@@ -7,6 +7,7 @@ public class Health : MonoBehaviour
     #region Inspector Properties
 
     [Description("Max amount of health for this entity")] [SerializeField]
+    [Min(0)]
     private int _maxHealth = 10;
 
     #endregion
