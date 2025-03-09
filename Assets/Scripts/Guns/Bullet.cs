@@ -32,6 +32,8 @@ public class Bullet : MonoBehaviour
     [HideInInspector]
     public float knockBackForceOnDead = 20;
 
+    [HideInInspector] public GameObject owner;
+
     #endregion 
 
     private void Awake()

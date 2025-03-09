@@ -28,7 +28,7 @@ public class Shoot : MonoBehaviour
         var gunComponent = Weapon.GetComponent<Gun>();
         Debug.Assert(gunComponent !=null, "A gun should always have a gun component");
         
-        gunComponent.Fire(GetTarget());
+        gunComponent.Fire(GetTarget(), gameObject);
     }
 
     private Vector3 GetTarget()

@@ -51,26 +51,31 @@ public class Gun : MonoBehaviour
         _timeSinceLastShot += Time.deltaTime;
     }
 
-    public void Fire(Vector3 target)
+    /// <summary>
+    /// Fire the gun at the specified target.
+    /// </summary>
+    /// <param name="target">Where to shoot at</param>
+    /// <param name="owner">Owner of the bullet</param>
+    public void Fire(Vector3 target, GameObject owner)
     {
         if (_timeSinceLastShot < fireRate)
             return;
         
         _timeSinceLastShot = 0;
-        SpawnBullet(target);
+        SpawnBullet(target, owner);
         ScreenShake();
         
         OnShoot?.Invoke();
     }
 
-    private void SpawnBullet(Vector3 target)
+    private void SpawnBullet(Vector3 target, GameObject owner)
     {
         var direction = target - bulletSpawnPoint.position;
         direction.Normalize();
         
         var bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
         
-        SetupBullet(bullet, target);
+        SetupBullet(bullet, target, owner);
     }
 
     private void ScreenShake()
@@ -79,11 +84,14 @@ public class Gun : MonoBehaviour
             _impulseSource.GenerateImpulse(Vector3.forward);        
     }
 
-    private void SetupBullet(GameObject bullet, Vector3 target)
+    private void SetupBullet(GameObject bullet, Vector3 target, GameObject owner)
     {
         var bulletComponent = bullet.GetComponent<Bullet>();
         bulletComponent.knockBackForce  = knockBackForce;
         bulletComponent.knockBackForceOnDead = knockBackForceOnDead;
+        bulletComponent.owner = owner;
         bullet.transform.LookAt(target);
     }
+    
+    private bool OnRecoil => _timeSinceLastShot < fireRate;
 }

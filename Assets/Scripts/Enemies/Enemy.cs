@@ -2,7 +2,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.ComponentModel;
 using DG.Tweening;
-using System;
+using Unity.Behavior;
+using Unity.AI;
+using UnityEngine.AI;
+using Action = System.Action;
 
 [RequireComponent(typeof(Health), typeof(Rigidbody))]
 public class Enemy : MonoBehaviour
@@ -25,10 +28,17 @@ public class Enemy : MonoBehaviour
     #endregion
     
     #region Internal State
-    Health _health;
-    Rigidbody _rigidbody;
     
     Queue<Vector3> _forceRequests = new();
+    #endregion
+    
+    #region Components
+    
+    Health _health;
+    Rigidbody _rigidbody;
+    BehaviorGraphAgent _bgAgent;
+    NavMeshAgent _navAgent;
+    
     #endregion
 
     #region Callbacks
@@ -41,6 +51,8 @@ public class Enemy : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         _health = GetComponent<Health>();
+        _bgAgent = GetComponent<BehaviorGraphAgent>();
+        _navAgent = GetComponent<NavMeshAgent>();
     }
 
     private void Start()
@@ -79,15 +91,19 @@ public class Enemy : MonoBehaviour
             () => { _renderer.material = _deadEnemyMaterial;}
         ).Play();
         
+        // Shutdown the AI
+        _bgAgent.enabled = false;
+        _navAgent.enabled = false;
+        
         // Report this enemy as dead
-        if (change.IsDamage)
+        if (change.JustDied(health))
             OnJustDied?.Invoke(); 
     }
 
     private void OnHurt(Health health, Health.Change change)
     {
         // Apply knockback to enemy
-        _rigidbody.AddForce(change.knockback * change.direction, ForceMode.Impulse);
+        _rigidbody.AddForce(change.knockback * _knockbackMultiplier * change.direction, ForceMode.Impulse);
         OnDead(health, change);
     }
 

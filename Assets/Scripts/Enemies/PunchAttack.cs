@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using UnityEngine;
 
@@ -12,12 +13,20 @@ public class PunchAttack : MonoBehaviour
     [Description("How much force to apply to the player on a punch")] [SerializeField]
     private float knockbackForce;
     
+    [SerializeField]
+    [Description("Range detector used to check if can punch player")]
+    RangeDetector rangeDetector;
+    
+    [SerializeField]
+    [Description("How much time to wait before punches")]
+    private float timeBetweenPunches = 0.5f;
     #endregion 
     
     #region Internal State
     public bool WantsToPunch = true;
+    private float _timeSinceLastPunch;
     #endregion
-
+    
     public void PunchPlayer(Player player)
     {
         var health = player.Health;
@@ -25,15 +34,18 @@ public class PunchAttack : MonoBehaviour
         health.TakeDamage(damage, punchDirection, knockbackForce, 2 * knockbackForce);
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void Update()
     {
         if (!WantsToPunch)
             return;
         
-        var player = other.gameObject.GetComponent<Player>();
-        if (player == null)
-            return;
-        
-        PunchPlayer(player);
+        _timeSinceLastPunch += Time.deltaTime;
+
+        if (rangeDetector.IsPlayerInRange() && _timeSinceLastPunch >= timeBetweenPunches)
+        {
+            _timeSinceLastPunch = 0;            
+            PunchPlayer(rangeDetector.Player);
+        }
     }
+
 }
