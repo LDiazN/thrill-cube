@@ -194,6 +194,7 @@ GameObject:
   - component: {fileID: 8860263524416226110}
   - component: {fileID: 7404962673105438467}
   - component: {fileID: 4327687340829821945}
+  - component: {fileID: 5657522142634949134}
   m_Layer: 0
   m_Name: ShooterEnemy
   m_TagString: Untagged
@@ -385,6 +386,7 @@ MonoBehaviour:
   - rid: 6145274064763355598
   - rid: 6145274064763355599
   - rid: 6145274064763355718
+  - rid: 6145274085864898782
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -430,6 +432,14 @@ MonoBehaviour:
           m_Value1: 4726153609931528572
         Name: Gun
         m_Value: {fileID: 5856640394363372025}
+    - rid: 6145274085864898782
+      type: {class: 'BlackboardVariable`1[[Perceptions, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 10685557763202964322
+          m_Value1: 12520067389059582619
+        Name: Perceptions
+        m_Value: {fileID: 5657522142634949134}
 --- !u!114 &3031830382357644161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -498,6 +508,18 @@ MonoBehaviour:
   rangeDetector: {fileID: 3031830382357644161}
   timeBetweenPunches: 0.5
   WantsToPunch: 0
+--- !u!114 &5657522142634949134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368970634977195101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc235fd76d28ddb48bc8cb9fd8cd927c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3314823791744504487
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,8 +6,7 @@ public class Health : MonoBehaviour
 {
     #region Inspector Properties
 
-    [Description("Max amount of health for this entity")] [SerializeField]
-    [Min(0)]
+    [Description("Max amount of health for this entity")] [SerializeField] [Min(0)]
     private int _maxHealth = 10;
 
     #endregion
@@ -28,14 +27,13 @@ public class Health : MonoBehaviour
     #region Internal State
 
     // We only serialize it to see it in inspector
-    [SerializeField]
-    int _currentHealth;
+    [SerializeField] int _currentHealth;
 
     /// <summary>
     /// Current amount of health
     /// </summary>
     public int CurrentHealth => _currentHealth;
-    
+
     public bool isDead => _currentHealth <= 0;
 
     #endregion
@@ -46,6 +44,7 @@ public class Health : MonoBehaviour
         public Vector3 direction;
         public float knockback;
         public float knockbackOnDead;
+        public GameObject perpetrator;
 
         public bool IsDamage => offset < 0;
         public bool IsHeal => knockback > 0;
@@ -58,13 +57,19 @@ public class Health : MonoBehaviour
         _currentHealth = _maxHealth;
     }
 
-    public void TakeDamage(int damage, Vector3 hitDirection = new Vector3(), float knockback = 0f, float knockbackOnDead = 0f)
+    public void TakeDamage(int damage, Vector3 hitDirection = new Vector3(), float knockback = 0f,
+        float knockbackOnDead = 0f, GameObject perpetrator = null)
     {
         var newHealth = Mathf.Clamp(_currentHealth - damage, 0, _maxHealth);
         var offset = newHealth - CurrentHealth;
         _currentHealth = newHealth;
-        
-        OnHealthChanged?.Invoke(this, new Change{direction = hitDirection, offset = offset, knockback = knockback, knockbackOnDead = knockbackOnDead});
+
+        OnHealthChanged?.Invoke(this,
+            new Change
+            {
+                direction = hitDirection, offset = offset, knockback = knockback, knockbackOnDead = knockbackOnDead,
+                perpetrator = perpetrator
+            });
     }
 
     public void Heal(int healAmount)

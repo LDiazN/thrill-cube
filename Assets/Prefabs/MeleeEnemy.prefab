@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 2524858167930264281}
   - component: {fileID: 2779062166010254781}
   - component: {fileID: 6429610982980018103}
+  - component: {fileID: 9116853456556706716}
   m_Layer: 0
   m_Name: MeleeEnemy
   m_TagString: Untagged
@@ -443,6 +444,8 @@ MonoBehaviour:
   - rid: 6145274055829225573
   - rid: 6145274055829225756
   - rid: 6145274055829226006
+  - rid: 6145274085864898675
+  - rid: 6145274085864898676
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -480,6 +483,22 @@ MonoBehaviour:
           m_Value1: 13725198010210482941
         Name: Punch Attack
         m_Value: {fileID: 430316695675081883}
+    - rid: 6145274085864898675
+      type: {class: 'BlackboardVariable`1[[Perceptions, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 2249284814757010056
+          m_Value1: 6710380215627605800
+        Name: Perceptions
+        m_Value: {fileID: 9116853456556706716}
+    - rid: 6145274085864898676
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 12490923407380608056
+          m_Value1: 17097379075205465493
+        Name: IsAlive
+        m_Value: 1
 --- !u!114 &145910464131740352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,6 +573,7 @@ MonoBehaviour:
   - rid: 6145274055829225573
   - rid: 6145274055829225756
   - rid: 6145274055829226006
+  - rid: 6145274085864898679
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -591,6 +611,26 @@ MonoBehaviour:
           m_Value1: 13725198010210482941
         Name: Punch Attack
         m_Value: {fileID: 430316695675081883}
+    - rid: 6145274085864898679
+      type: {class: 'BlackboardVariable`1[[Perceptions, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 2249284814757010056
+          m_Value1: 6710380215627605800
+        Name: Perceptions
+        m_Value: {fileID: 9116853456556706716}
+--- !u!114 &9116853456556706716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5802897395679835323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc235fd76d28ddb48bc8cb9fd8cd927c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6442752434531078961
 GameObject:
   m_ObjectHideFlags: 0

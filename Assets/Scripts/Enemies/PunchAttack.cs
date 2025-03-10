@@ -31,7 +31,7 @@ public class PunchAttack : MonoBehaviour
     {
         var health = player.Health;
         var punchDirection = (player.transform.position - transform.position).normalized;
-        health.TakeDamage(damage, punchDirection, knockbackForce, 2 * knockbackForce);
+        health.TakeDamage(damage, punchDirection, knockbackForce, 2 * knockbackForce, gameObject);
     }
 
     private void Update()

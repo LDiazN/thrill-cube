@@ -57,7 +57,7 @@ public class Bullet : MonoBehaviour
         // Check if you can hurt the other entity
         var health = other.gameObject.GetComponent<Health>();
         if (health != null)
-            health.TakeDamage(damage, transform.forward, knockBackForce, knockBackForceOnDead);
+            health.TakeDamage(damage, transform.forward, knockBackForce, knockBackForceOnDead, owner);
         
         // Start animation and destroy this bullet
         transform.DOScale(Vector3.zero, 0.1f).OnComplete(() => Destroy(gameObject)).Play();
