@@ -17,6 +17,12 @@ public class Perceptions : MonoBehaviour
     private GameObject _lastHurted;
     public GameObject LastHurted => _lastHurted;
     
+    /// <summary>
+    /// Current knowledge area for this enemy.
+    /// Can be null when not in a knowledge area
+    /// </summary>
+    public KnowledgeArea knowledgeArea;
+    
     #endregion
     private void Awake()
     {
@@ -40,5 +46,13 @@ public class Perceptions : MonoBehaviour
             return;
 
         _lastHurted = change.perpetrator;
+    }
+    
+    public void PlayerDiscovered(Player player)
+    {
+        if (knowledgeArea == null)
+            return;
+        
+        knowledgeArea.player = player;
     }
 }
