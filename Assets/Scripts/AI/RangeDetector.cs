@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Checks if the player is within the specified range
@@ -9,8 +10,8 @@ public class RangeDetector : MonoBehaviour
 {
     #region Inspector Properties
 
-    [Description("Just an editor name to know what this detector does")]
-    public string name;
+    [FormerlySerializedAs("name")] [Description("Just an editor name to know what this detector does")]
+    public string detectorName;
 
     [Description("Player to check for range")] [SerializeField]
     private Player player;
