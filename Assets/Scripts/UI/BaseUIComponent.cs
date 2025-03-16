@@ -8,7 +8,7 @@ public abstract class BaseUIComponent : MonoBehaviour
     
     private void Awake()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = FindFirstObjectByType<GameManager>();
     }
     
     private void OnEnable()

@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4abbf8d6caa9c604887b199e5c2272c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 40
+  maxSpeed: 20
   destroyParticles: {fileID: 6995799823304382606, guid: d12f13a48583ccb4fb0552534ecedb6d, type: 3}
   damage: 1
   knockBackForce: 1

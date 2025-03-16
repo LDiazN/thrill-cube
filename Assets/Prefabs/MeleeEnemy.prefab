@@ -259,7 +259,6 @@ GameObject:
   - component: {fileID: 145910464131740352}
   - component: {fileID: 2524858167930264281}
   - component: {fileID: 2779062166010254781}
-  - component: {fileID: 6429610982980018103}
   - component: {fileID: 9116853456556706716}
   m_Layer: 0
   m_Name: MeleeEnemy
@@ -511,7 +510,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: 
+  detectorName: 
   player: {fileID: 0}
   range: 14.9
   gizmosColor: {r: 1, g: 0.9424448, b: 0, a: 1}
@@ -528,7 +527,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: 
+  detectorName: 
   player: {fileID: 0}
   range: 2.84
   gizmosColor: {r: 1, g: 0, b: 0, a: 1}
@@ -555,70 +554,6 @@ NavMeshAgent:
   m_BaseOffset: 1.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6429610982980018103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5802897395679835323}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Graph: {fileID: 9022775479985816450, guid: 692dfd5a7c2d1b846870cc77fcc487e7, type: 2}
-  m_BlackboardVariableOverridesList:
-  - rid: 6145274055829225572
-  - rid: 6145274055829225573
-  - rid: 6145274055829225756
-  - rid: 6145274055829226006
-  - rid: 6145274085864898679
-  m_IsInitialised: 0
-  m_IsStarted: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 6145274055829225572
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        m_Value: {fileID: 5802897395679835323}
-    - rid: 6145274055829225573
-      type: {class: 'BlackboardVariable`1[[Health, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 12512483062440138970
-          m_Value1: 422105369368584327
-        Name: MyHealth
-        m_Value: {fileID: 7628799157036998794}
-    - rid: 6145274055829225756
-      type: {class: 'BlackboardVariable`1[[RangeDetector, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 69694783135770483
-          m_Value1: 7737423292085014493
-        Name: Range Detector
-        m_Value: {fileID: 145910464131740352}
-    - rid: 6145274055829226006
-      type: {class: 'BlackboardVariable`1[[PunchAttack, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 13594810170230968821
-          m_Value1: 13725198010210482941
-        Name: Punch Attack
-        m_Value: {fileID: 430316695675081883}
-    - rid: 6145274085864898679
-      type: {class: 'BlackboardVariable`1[[Perceptions, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 2249284814757010056
-          m_Value1: 6710380215627605800
-        Name: Perceptions
-        m_Value: {fileID: 9116853456556706716}
 --- !u!114 &9116853456556706716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -631,6 +566,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc235fd76d28ddb48bc8cb9fd8cd927c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  knowledgeArea: {fileID: 0}
 --- !u!1 &6442752434531078961
 GameObject:
   m_ObjectHideFlags: 0

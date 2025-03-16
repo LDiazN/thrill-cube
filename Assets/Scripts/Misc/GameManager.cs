@@ -35,14 +35,18 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _player = FindFirstObjectByType<Player>();
-        RegisterEnemies(FindEnemies());
+        _restartAction = InputSystem.actions.FindAction("Restart");
     }
 
     void Start()
     {
+        // Register enemies on start so that everything that depends on this manager
+        // can wire itself in case they are interested in this
+        RegisterEnemies(FindEnemies());
         // This needs to be on start so that PlayerHealth is set by then.
         // Player health is set in player's awake
-        _player.Health.OnHealthChanged += PlayerHealthChanged;
+        if (_player != null)
+            _player.Health.OnHealthChanged += PlayerHealthChanged;
         
         // Set up input for restart
         _restartAction.performed += OnRestartPressed;
@@ -85,6 +89,7 @@ public class GameManager : MonoBehaviour
 
     void WinGame()
     {
+        Debug.Log("You win!");
         _gameState = GameState.Win;
         OnWin?.Invoke();
     }

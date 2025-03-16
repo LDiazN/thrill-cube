@@ -73,13 +73,13 @@ public class ThirdPersonCamera : MonoBehaviour
     private void UpdateCameraRotation()
     {
         followTarget.transform.Rotate(Vector3.up,
-            _cameraMovement.x * cameraRotationSpeed * Time.deltaTime);
+            _cameraMovement.x * cameraRotationSpeed * Time.fixedDeltaTime);
     }
 
     private void UpdateCameraTilt()
     {
         // We only care about the X axis rotation
-        followTarget.transform.rotation *= Quaternion.AngleAxis(- cameraTiltSpeed * Time.deltaTime * _cameraMovement.y, Vector3.right);
+        followTarget.transform.rotation *= Quaternion.AngleAxis(-cameraTiltSpeed * Time.fixedDeltaTime * _cameraMovement.y, Vector3.right);
 
         var angles = followTarget.transform.localEulerAngles;
         angles.z = 0;

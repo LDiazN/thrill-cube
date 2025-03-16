@@ -51,9 +51,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _tpCamera.UpdateThirdPersonCamera();
         UpdateRotation();
         Move();
+    }
+
+    private void LateUpdate()
+    {
+        _tpCamera.UpdateThirdPersonCamera();
     }
 
     private void UpdateRotation()

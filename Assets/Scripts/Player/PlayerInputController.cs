@@ -37,7 +37,8 @@ public class PlayerInputController : PlayerController
 
     private void OnDisable()
     {
-        _attackAction.performed -= UpdateShoot;
+        if (_attackAction != null)
+            _attackAction.performed -= UpdateShoot;
     }
 
     void Update()

@@ -266,8 +266,8 @@ Rigidbody:
   m_GameObject: {fileID: 368970634977195101}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0.1
-  m_AngularDrag: 0.05
+  m_Drag: 1
+  m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -452,7 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Punch
+  detectorName: Punch
   player: {fileID: 0}
   range: 3.36
   gizmosColor: {r: 1, g: 0, b: 0, a: 1}
@@ -469,7 +469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Shoot
+  detectorName: Shoot
   player: {fileID: 0}
   range: 14.8
   gizmosColor: {r: 0.9866247, g: 1, b: 0, a: 1}
@@ -486,7 +486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Visibility
+  detectorName: Visibility
   player: {fileID: 0}
   range: 25.4
   gizmosColor: {r: 0.101122975, g: 1, b: 0, a: 1}
@@ -766,6 +766,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4351990021699187808}
     m_Modifications:
+    - target: {fileID: 3206965967334994735, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6445032975453214688, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
       propertyPath: m_Name
       value: Pistol
