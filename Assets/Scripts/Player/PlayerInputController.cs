@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerMovement), typeof(ThirdPersonCamera), typeof(Shoot))]
-public class PlayerInputController : MonoBehaviour
+public class PlayerInputController : PlayerController
 {
     
     #region Private Variables

@@ -42,6 +42,13 @@ public class Player : MonoBehaviour
         _health.OnHealthChanged -= HealthChanged;
     }
 
+    // Deactivates player input, doesn't matter if it's AI or human
+    public void DeactivateInput()
+    {
+        var controller = GetComponent<PlayerController>();
+        controller.enabled = false;
+    }
+
     private void HealthChanged(Health health, Health.Change change)
     {
         
