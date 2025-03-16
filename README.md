@@ -51,3 +51,6 @@ so you don't have to manually assign the area to each enemy.
 
 This is useful to implement behaviors like "detect when someone is attacking a nearby ally". This demo provides a sample level that showcases this feature: 
 
+
+![KnowledgeAreaTest](https://github.com/user-attachments/assets/5b969197-fa99-43c2-a10e-e1f7e74e3387)
+
