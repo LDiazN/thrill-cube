@@ -11,8 +11,16 @@ The AI is mostly implemented using [Unity 6's Behavior package](https://docs.uni
 actual behavior is implemented with custom action nodes. 
 
 --- 
-## Unity Version
+## Unity Version and dependencies
 Unity 6 (6000.0.40f1)
+
+This project requires the following packages: 
+
+1. Probuilder
+2. Dotween
+3. AI Navigation
+4. Cinemachine
+5. Behavior
 
 ## Behavior Trees
 These are the behavior trees implemented for each enemy: 
@@ -50,7 +58,6 @@ This area is basically a **trigger collider** with data that it's considered sha
 so you don't have to manually assign the area to each enemy. 
 
 This is useful to implement behaviors like "detect when someone is attacking a nearby ally". This demo provides a sample level that showcases this feature: 
-
 
 ![KnowledgeAreaTest](https://github.com/user-attachments/assets/5b969197-fa99-43c2-a10e-e1f7e74e3387)
 
