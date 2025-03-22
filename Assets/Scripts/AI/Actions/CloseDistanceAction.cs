@@ -29,6 +29,7 @@ public partial class CloseDistanceAction : Action
         if (rangeDetector.IsPlayerInRange())
         {
             navMeshAgent.isStopped = true;
+            navMeshAgent.SetDestination(navMeshAgent.transform.position);
             return Status.Success;
         }
         

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.ComponentModel;
+using JetBrains.Annotations;
 using UnityEngine;
 
 /// <summary>
@@ -22,7 +23,7 @@ public class Knockback : MonoBehaviour
     Health _health;
     Rigidbody _rigidbody;
     // Optional, only present if attached to player
-    Player _player;
+    [CanBeNull] Player _player;
     #endregion
 
     private void Awake()
@@ -49,10 +50,16 @@ public class Knockback : MonoBehaviour
         
         var force = change.JustDied(health) ? change.knockbackOnDead : change.knockback;
         force *= knockbackMultiplier;
-        _rigidbody.AddForce(change.direction * force, ForceMode.Impulse);        
         
-        if (_player != null)
+        Knock(force, change.direction);
+        
+        if (_player)
             OnHurtPlayer(change);
+    }
+
+    public void Knock(float force, Vector3 direction)
+    {
+        _rigidbody.AddForce(direction * force, ForceMode.Impulse);        
     }
 
     private void OnHurtPlayer(Health.Change change)

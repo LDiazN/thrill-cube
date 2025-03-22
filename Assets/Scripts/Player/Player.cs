@@ -33,7 +33,6 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        ConnectToGUI();
         _health.OnHealthChanged += HealthChanged;
     }
 
@@ -52,11 +51,5 @@ public class Player : MonoBehaviour
     private void HealthChanged(Health health, Health.Change change)
     {
         
-    }
-
-    private void ConnectToGUI()
-    {
-        var playerUI = FindFirstObjectByType<PlayerHealthGUI>();
-        playerUI.Player = this;
     }
 }

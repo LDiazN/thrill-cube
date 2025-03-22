@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3548661793556144997}
   - component: {fileID: 6995769641108530805}
   - component: {fileID: 3333213834392443892}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 8093742245764146799}
   - component: {fileID: 1590648935794430332}
   - component: {fileID: 7614408841272752251}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -231,11 +231,11 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 5.16
-  m_Acceleration: 8
+  m_Speed: 19.88
+  m_Acceleration: 59.8
   avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_AngularSpeed: 600
+  m_StoppingDistance: 3
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -256,6 +256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 3
+  immortal: 0
   _currentHealth: 0
 --- !u!54 &1942389530592182962
 Rigidbody:
@@ -266,7 +267,7 @@ Rigidbody:
   m_GameObject: {fileID: 368970634977195101}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 1
+  m_Drag: 2.74
   m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -532,7 +533,7 @@ GameObject:
   - component: {fileID: 3456336017137919754}
   - component: {fileID: 2827123590146977607}
   - component: {fileID: 4273459547474500613}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -618,7 +619,7 @@ GameObject:
   - component: {fileID: 7199570758553481738}
   - component: {fileID: 3526922436803663909}
   - component: {fileID: 2831568424915597435}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RightEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -702,7 +703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7788583405477997326}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LeftEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -735,7 +736,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4351990021699187808}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -766,6 +767,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4351990021699187808}
     m_Modifications:
+    - target: {fileID: 1702307337104338614, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 3206965967334994735, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -773,6 +778,14 @@ PrefabInstance:
     - target: {fileID: 6445032975453214688, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
       propertyPath: m_Name
       value: Pistol
+      objectReference: {fileID: 0}
+    - target: {fileID: 6445032975453214688, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6467386770124417962, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6973782839040076689, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
       propertyPath: fireRate
@@ -782,6 +795,10 @@ PrefabInstance:
       propertyPath: bulletPrefab
       value: 
       objectReference: {fileID: 4583260921117651165, guid: 14a84fc74faf9d449b704e84437f11ee, type: 3}
+    - target: {fileID: 7408285716262361597, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8171562264088565204, guid: 9b9da79c325b46847a024822b0ba701f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

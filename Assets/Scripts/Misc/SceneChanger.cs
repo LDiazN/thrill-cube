@@ -26,7 +26,8 @@ public class SceneChanger : MonoBehaviour
 
     private void OnDisable()
     {
-        _loadMainMenu.performed -= GoMainMenu;
+        if (_loadMainMenu != null)
+            _loadMainMenu.performed -= GoMainMenu;
     }
 
 

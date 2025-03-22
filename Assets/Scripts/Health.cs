@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Health : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class Health : MonoBehaviour
 
     [Description("Max amount of health for this entity")] [SerializeField] [Min(0)]
     private int _maxHealth = 10;
+
+    public bool immortal = false;
 
     #endregion
 
@@ -60,6 +63,7 @@ public class Health : MonoBehaviour
     public void TakeDamage(int damage, Vector3 hitDirection = new Vector3(), float knockback = 0f,
         float knockbackOnDead = 0f, GameObject perpetrator = null)
     {
+        damage = immortal && damage > 0 ? 0 : damage;
         var newHealth = Mathf.Clamp(_currentHealth - damage, 0, _maxHealth);
         var offset = newHealth - CurrentHealth;
         _currentHealth = newHealth;

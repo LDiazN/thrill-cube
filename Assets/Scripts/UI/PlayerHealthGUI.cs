@@ -24,15 +24,15 @@ public class PlayerHealthGUI : MonoBehaviour
     {
         // Init Health Value
         if (_player != null)
+        {
+            _player.Health.OnHealthChanged += OnHealthChange;
             UpdateHealthText(_player.Health);
+        }
     }
 
     private void OnEnable()
     {
-        if (_player == null)
-            return;
-
-        _player.Health.OnHealthChanged += OnHealthChange;
+        _player = FindFirstObjectByType<Player>();
     }
 
     private void OnDisable()

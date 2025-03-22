@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
     #region Inspector Variables
 
     [FormerlySerializedAs("_maxSpeed")] [SerializeField] private float maxSpeed = 1f;
+    [Description("Type of force applied to the player for movement")]
+    [SerializeField] private ForceMode forceMode = ForceMode.Force;
 
     #endregion
 
@@ -84,9 +85,14 @@ public class PlayerMovement : MonoBehaviour
         if (!_canMove)
             return;
         
-        var movement = _movementDirection.z * maxSpeed * transform.forward +
-                       _movementDirection.x * maxSpeed * transform.right;
-        _rigidbody.linearVelocity = movement;
+        var velocity = maxSpeed * _movementDirection.normalized;
+        var movement = velocity.z * transform.forward +
+                       velocity.x * transform.right;
+        
+        _rigidbody.AddForce(movement, forceMode);
+        
+        if (_rigidbody.linearVelocity.magnitude > maxSpeed)
+            _rigidbody.linearVelocity= _rigidbody.linearVelocity.normalized * maxSpeed;
     }
 
     private void OnDrawGizmos()
