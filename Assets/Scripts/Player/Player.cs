@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using UnityEngine;
 
 /// <summary>
@@ -7,6 +8,15 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody), typeof(Health), typeof(Shoot))]
 public class Player : MonoBehaviour
 {
+    #region Inspector properties
+    [SerializeField] private AudioSource playerAudioSource;
+    public AudioSource PlayerAudioSource => playerAudioSource;
+    
+    [Header("Audio")]
+    [Description("Played when hurt")]
+    [SerializeField] private AudioClip[] hurtClips;
+    #endregion
+    
     #region Components
     
     Health _health;
@@ -29,6 +39,9 @@ public class Player : MonoBehaviour
         _shoot = GetComponent<Shoot>();
         _rigidbody = GetComponent<Rigidbody>();
         _playerMovement = GetComponent<PlayerMovement>();
+        
+        if(!playerAudioSource)
+            Debug.LogWarning("No player audio source set up in inspector!");
     }
 
     private void OnEnable()
@@ -50,6 +63,7 @@ public class Player : MonoBehaviour
 
     private void HealthChanged(Health health, Health.Change change)
     {
-        
+        if (change.IsDamage) 
+            AudioManager.PlayAudioAtPosition(transform.position, hurtClips);
     }
 }

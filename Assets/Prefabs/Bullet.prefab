@@ -274,6 +274,8 @@ MonoBehaviour:
   maxSpeed: 80
   destroyParticles: {fileID: 6995799823304382606, guid: f5f05794c069faa4a9f5f7ee95b187af, type: 3}
   damage: 1
+  wallHitClips:
+  - {fileID: 8300000, guid: 11d3b51f513508b4395c6466bf50337b, type: 3}
   knockBackForce: 1
   knockBackForceOnDead: 20
   owner: {fileID: 0}

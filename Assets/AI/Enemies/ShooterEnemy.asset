@@ -230,7 +230,7 @@ MonoBehaviour:
         AuthoringAssetID:
           m_Value0: 6071950444018523988
           m_Value1: 2714553314366100792
-        m_DebugInfo: {fileID: 0}
+        m_DebugInfo: {fileID: 4096109219624723713}
         Root:
           rid: 6145274354687017161
         BlackboardReference:
@@ -2930,6 +2930,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b27bb6d9a2c8d540a10dff10acc543e, type: 3}
   m_Name: ShooterEnemy Debug Info
   m_EditorClassIdentifier: 
-  m_CodeBreakPointsList:
-  - m_Value0: 7305198314793049620
-    m_Value1: 13249068629140176770
+  m_CodeBreakPointsList: []

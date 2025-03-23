@@ -30,6 +30,7 @@ public class Enemy : MonoBehaviour
     #region Internal State
     
     Queue<Vector3> _forceRequests = new();
+    
     #endregion
     
     #region Components
@@ -38,6 +39,8 @@ public class Enemy : MonoBehaviour
     Rigidbody _rigidbody;
     BehaviorGraphAgent _bgAgent;
     NavMeshAgent _navAgent;
+    
+    public Health Health => _health;
     
     #endregion
 

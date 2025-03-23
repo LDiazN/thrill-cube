@@ -3,7 +3,7 @@ using System.ComponentModel;
 using Unity.Cinemachine;
 using UnityEngine;
 
-[RequireComponent(typeof(CinemachineImpulseSource))]
+[RequireComponent(typeof(CinemachineImpulseSource), typeof(SFXPlayer))]
 public class Gun : MonoBehaviour
 {
     #region Inspector Properties
@@ -26,10 +26,12 @@ public class Gun : MonoBehaviour
     
     [Description("Force to apply in the direction of the shot when the enemy dies")] [SerializeField]
     private float knockBackForceOnDead = 20;
+    
     #endregion
 
     #region Components 
     CinemachineImpulseSource _impulseSource;
+    SFXPlayer _sfxPlayer;
     #endregion
     
     #region Callbacks
@@ -45,6 +47,12 @@ public class Gun : MonoBehaviour
     private void Awake()
     {
         _impulseSource = GetComponent<CinemachineImpulseSource>();
+        _sfxPlayer = GetComponent<SFXPlayer>();
+    }
+
+    private void OnEnable()
+    {
+        OnShoot += _sfxPlayer.PlaySound;
     }
 
     private void Update()
@@ -81,7 +89,7 @@ public class Gun : MonoBehaviour
 
     private void ScreenShake()
     {
-        if (Camera.main != null)
+        if (Camera.main)
             _impulseSource.GenerateImpulse(Vector3.forward);        
     }
 

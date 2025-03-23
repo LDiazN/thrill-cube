@@ -3,7 +3,6 @@ using System.ComponentModel;
 using DG.Tweening;
 using UnityEngine;
 
-[RequireComponent(typeof(BoxCollider))]
 public class Bullet : MonoBehaviour
 {
     #region Inspector Properties
@@ -17,6 +16,9 @@ public class Bullet : MonoBehaviour
     [Description("How much damage should this bullet do")] 
     public int damage = 1;
     
+    [Header("Audio")]
+    [Description("Played when hitting something not alive")]
+    public AudioClip[] wallHitClips;
     #endregion
     
     #region Components
@@ -56,8 +58,10 @@ public class Bullet : MonoBehaviour
 
         // Check if you can hurt the other entity
         var health = other.gameObject.GetComponent<Health>();
-        if (health != null)
+        if (health)
             health.TakeDamage(damage, transform.forward, knockBackForce, knockBackForceOnDead, owner);
+        else if (wallHitClips.Length > 0)
+            AudioManager.PlayAudioAtPosition(transform.position, wallHitClips);
         
         // Start animation and destroy this bullet
         transform.DOScale(Vector3.zero, 0.1f).OnComplete(() => Destroy(gameObject)).Play();

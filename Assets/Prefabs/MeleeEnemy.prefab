@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 2524858167930264281}
   - component: {fileID: 2779062166010254781}
   - component: {fileID: 9116853456556706716}
+  - component: {fileID: 4673869758979817814}
   m_Layer: 0
   m_Name: MeleeEnemy
   m_TagString: Untagged
@@ -298,6 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 10
+  immortal: 0
   _currentHealth: 10
 --- !u!114 &5196892675574400974
 MonoBehaviour:
@@ -364,7 +366,7 @@ MonoBehaviour:
   knockbackForce: 60.4
   rangeDetector: {fileID: 2524858167930264281}
   timeBetweenPunches: 0.5
-  WantsToPunch: 0
+  WantsToPunch: 1
 --- !u!114 &7604492395043426356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,7 +512,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectorName: 
+  detectorName: Visibility
   player: {fileID: 0}
   range: 14.9
   gizmosColor: {r: 1, g: 0.9424448, b: 0, a: 1}
@@ -527,7 +529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectorName: 
+  detectorName: Punch
   player: {fileID: 0}
   range: 2.84
   gizmosColor: {r: 1, g: 0, b: 0, a: 1}
@@ -567,6 +569,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   knowledgeArea: {fileID: 0}
+--- !u!114 &4673869758979817814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5802897395679835323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd199cfd5f761d04fbc5338b425da0b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hurtClips:
+  - {fileID: 8300000, guid: e37ce66ee4e42f14cb24631d22f7206c, type: 3}
+  - {fileID: 8300000, guid: 9d4d849905cc8ee4785426f96726a0ba, type: 3}
+  - {fileID: 8300000, guid: 2165c4d34d9edee42bf08cd29ad71529, type: 3}
+  deathClips:
+  - {fileID: 8300000, guid: 8be1b03190899df41b5a4da3803c57fd, type: 3}
 --- !u!1 &6442752434531078961
 GameObject:
   m_ObjectHideFlags: 0
