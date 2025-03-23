@@ -26,7 +26,16 @@ public class Gun : MonoBehaviour
     
     [Description("Force to apply in the direction of the shot when the enemy dies")] [SerializeField]
     private float knockBackForceOnDead = 20;
-    
+
+    [Header("Ammo")]
+    [Description("How many bullets does this weapon have on start")] [SerializeField]
+    private int magSize = 10;
+
+    [Description("If this weapon has infinite ammo, mostly for enemies")] [SerializeField]
+    private bool infiniteAmmo = false;
+
+    [Description("Sound played when the player tries to shoot without ammo")] [SerializeField]
+    private AudioClip noAmmoSound;
     #endregion
 
     #region Components 
@@ -36,12 +45,16 @@ public class Gun : MonoBehaviour
     
     #region Callbacks
 
-    public event Action OnShoot;
+    // Called with true if could shoot, false otherwise
+    public event Action<bool> OnShoot;
     
     #endregion 
     #region Internal State 
     private float _timeSinceLastShot;
     public bool IsOnRecoil => _timeSinceLastShot < fireRate;
+
+    public int _currentAmmo;
+    public int CurrentAmmo => _currentAmmo;
     #endregion
 
     private void Awake()
@@ -52,7 +65,12 @@ public class Gun : MonoBehaviour
 
     private void OnEnable()
     {
-        OnShoot += _sfxPlayer.PlaySound;
+        OnShoot += PlayShootSound;
+    }
+
+    private void Start()
+    {
+        _currentAmmo = magSize;
     }
 
     private void Update()
@@ -69,12 +87,18 @@ public class Gun : MonoBehaviour
     {
         if (_timeSinceLastShot < fireRate)
             return;
+        if (_currentAmmo == 0 && !infiniteAmmo)
+        {
+            OnShoot?.Invoke(false);
+            return;
+        }
         
         _timeSinceLastShot = 0;
         SpawnBullet(target, owner);
         ScreenShake();
+        _currentAmmo = Mathf.Max(_currentAmmo - 1, 0);
         
-        OnShoot?.Invoke();
+        OnShoot?.Invoke(true);
     }
 
     private void SpawnBullet(Vector3 target, GameObject owner)
@@ -101,5 +125,20 @@ public class Gun : MonoBehaviour
         bulletComponent.owner = owner;
         bullet.transform.LookAt(target);
     }
-    
+
+    private void PlayShootSound(bool couldShoot)
+    {
+        if (couldShoot)
+        {
+            _sfxPlayer.PlaySound();
+            return;
+        }
+
+        _sfxPlayer.PlaySound(noAmmoSound);
+    }
+
+    public bool IsEmpty()
+    {
+        return _currentAmmo == 0;
+    }
 }

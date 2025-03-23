@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2823015125613917121}
   - component: {fileID: 4599776404472832686}
   - component: {fileID: 2835373878871765268}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Eyebrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2724344828016168856}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RightEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5542499558093801820}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LeftEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +163,7 @@ GameObject:
   - component: {fileID: 641517898190304018}
   - component: {fileID: 3296551873978666545}
   - component: {fileID: 1871910013236528307}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -582,11 +582,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hurtClips:
-  - {fileID: 8300000, guid: e37ce66ee4e42f14cb24631d22f7206c, type: 3}
-  - {fileID: 8300000, guid: 9d4d849905cc8ee4785426f96726a0ba, type: 3}
-  - {fileID: 8300000, guid: 2165c4d34d9edee42bf08cd29ad71529, type: 3}
+  - {fileID: 8300000, guid: b39251717ac99d546a4b0ff8c7a958d1, type: 3}
+  - {fileID: 8300000, guid: a983a215e65531c449819f60d2d2f042, type: 3}
+  - {fileID: 8300000, guid: 76349dc41ea55ee49a22d0d0a9c183f6, type: 3}
+  - {fileID: 8300000, guid: 23ade39abb33ac24b96e949a0750bf3a, type: 3}
+  - {fileID: 8300000, guid: 94ccea69732f16044a262ef9104255df, type: 3}
   deathClips:
-  - {fileID: 8300000, guid: 8be1b03190899df41b5a4da3803c57fd, type: 3}
+  - {fileID: 8300000, guid: 2cdfbbf37bd5e164fb23cc5419084945, type: 3}
 --- !u!1 &6442752434531078961
 GameObject:
   m_ObjectHideFlags: 0
@@ -598,7 +600,7 @@ GameObject:
   - component: {fileID: 1228909017118147040}
   - component: {fileID: 7019298066425352929}
   - component: {fileID: 3682864195238079483}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -684,7 +686,7 @@ GameObject:
   - component: {fileID: 2985162629844366006}
   - component: {fileID: 3854753210033835871}
   - component: {fileID: 211799986639140984}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -770,7 +772,7 @@ GameObject:
   - component: {fileID: 119548514933724789}
   - component: {fileID: 9029604393978081156}
   - component: {fileID: 4176963047824313335}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RightEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,4 +1,5 @@
-using System;
+using System.ComponentModel;
+using JetBrains.Annotations;
 using UnityEngine;
 
 [RequireComponent(typeof(ThirdPersonCamera))]
@@ -7,7 +8,11 @@ public class Shoot : MonoBehaviour
     #region Inspector Variables
     
     // Might be null if no weapon is attached
-    public GameObject Weapon;
+    [CanBeNull] public Gun Weapon;
+    
+    
+    [Description("Game object where the gun will be attached after changing weapons")] [SerializeField]
+    private Transform weaponSlot;
     
     #endregion
     
@@ -49,5 +54,16 @@ public class Shoot : MonoBehaviour
         
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(GetTarget(), 1);
+    }
+
+    public void SetWeapon(Gun gunPrefab)
+    {
+        var oldWeapon = Weapon;
+        Weapon = Instantiate(gunPrefab, weaponSlot);
+        System.Diagnostics.Debug.Assert(Weapon != null, nameof(Weapon) + " != null");
+        Weapon.transform.localPosition = Vector3.zero;
+        Weapon.transform.localRotation = Quaternion.identity;
+        if (oldWeapon)
+            Destroy(oldWeapon.gameObject);
     }
 }

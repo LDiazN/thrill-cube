@@ -26,9 +26,13 @@ public class GunAnimation : MonoBehaviour
         _gun.OnShoot -= TriggerShootingAnimation;
     }
 
-    private void TriggerShootingAnimation()
+    private void TriggerShootingAnimation(bool couldShoot)
     {
         _animator.speed = 1f / _gun.FireRate;
-        _animator.SetTrigger(GunAnimationParams.shoot);
+        if (couldShoot)
+        {
+            _animator.SetTrigger(GunAnimationParams.shoot);
+        }
+        _animator.SetTrigger(GunAnimationParams.failedShot);
     }
 }

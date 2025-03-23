@@ -20,9 +20,14 @@ public class SFXPlayer : MonoBehaviour
 
     public void PlaySound()
     {
+        PlaySound(clips[Random.Range(0, clips.Length)]);
+    }
+
+    public void PlaySound(AudioClip clip)
+    {
         _audioSource.pitch = Random.Range(0.9f, 1.1f);
         _audioSource.time = Random.Range(0, clips.Length / 2f);
-        _audioSource.PlayOneShot(clips[Random.Range(0, clips.Length)]);
+        _audioSource.PlayOneShot(clip);
     }
     
 }

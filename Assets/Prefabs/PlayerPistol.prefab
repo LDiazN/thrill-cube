@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5853462003341289828}
   - component: {fileID: 2074101455108683815}
   m_Layer: 0
-  m_Name: Pistol
+  m_Name: PlayerPistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,10 +50,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a1f110cac6fb84cab9d29eda4c73ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 0.25
+  fireRate: 0.15
   bulletPrefab: {fileID: 4583260921117651165, guid: eb3a68476d5721942ae49c73d5bcfc2f, type: 3}
   bulletSpawnPoint: {fileID: 1101712839139967355}
-  knockBackForce: 1
+  knockBackForce: 5
   knockBackForceOnDead: 20
   magSize: 10
   infiniteAmmo: 0
