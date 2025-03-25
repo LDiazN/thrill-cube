@@ -25,7 +25,12 @@ public class WeaponDroper : MonoBehaviour
 
     private void SpawnPicker(Health health, Health.Change change)
     {
-        if (change.JustDied(health))
-            Debug.Log("Spawning picker");
+        if (change.JustDied(health) && picker)
+        {
+            var position = transform.position;
+            position.y = 0;
+            Instantiate(picker, position, Quaternion.identity);
+        }
+            
     }
 }

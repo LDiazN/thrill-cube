@@ -27,6 +27,9 @@ public class Player : MonoBehaviour
     
     Shoot _shoot;
     public Shoot Shoot => _shoot;
+
+    Throw _throw;
+    public Throw Throw => _throw;
     
     Rigidbody _rigidbody;
     public Rigidbody Rigidbody => _rigidbody;
@@ -40,6 +43,7 @@ public class Player : MonoBehaviour
     {
         _health = GetComponent<Health>();
         _shoot = GetComponent<Shoot>();
+        _throw = GetComponent<Throw>();
         _rigidbody = GetComponent<Rigidbody>();
         _playerMovement = GetComponent<PlayerMovement>();
         
@@ -55,6 +59,10 @@ public class Player : MonoBehaviour
     private void OnDisable()
     {
         _health.OnHealthChanged -= HealthChanged;
+    }
+
+    private void Start()
+    {
     }
 
     // Deactivates player input, doesn't matter if it's AI or human

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -29,11 +30,11 @@ public class Shoot : MonoBehaviour
 
     public void Fire()
     {
-        if (Weapon == null)
+        if (!Weapon)
             return;
 
         var gunComponent = Weapon.GetComponent<Gun>();
-        Debug.Assert(gunComponent !=null, "A gun should always have a gun component");
+        Debug.Assert(gunComponent, "A gun should always have a gun component");
         
         gunComponent.Fire(GetTarget(), gameObject);
     }
@@ -58,14 +59,25 @@ public class Shoot : MonoBehaviour
         Gizmos.DrawSphere(GetTarget(), 1);
     }
 
-    public void SetWeapon(Gun gunPrefab)
+    public void SetWeapon(Gun gun)
     {
+        // equiping itself, nothing to do
+        if (gun == Weapon)
+            return;
+        
         var oldWeapon = Weapon;
-        Weapon = Instantiate(gunPrefab, weaponSlot);
-        System.Diagnostics.Debug.Assert(Weapon != null, nameof(Weapon) + " != null");
-        Weapon.transform.localPosition = Vector3.zero;
-        Weapon.transform.localRotation = Quaternion.identity;
+        // Gun prefab can be null to unequip a gun
+        if (gun)
+        {
+            // if an actual object, not a prefab, use the object itself
+            Weapon = gun.gameObject.scene.IsValid() ? gun : Instantiate(gun, weaponSlot);
 
+            System.Diagnostics.Debug.Assert(Weapon, nameof(Weapon) + " != null");
+            Weapon.transform.localPosition = Vector3.zero;
+            Weapon.transform.localRotation = Quaternion.identity;
+        }
+        else
+            Weapon = null;
 
         if (gunPickSFX)
             gunPickSFX.PlaySound();            

@@ -8,6 +8,7 @@ public class SFXPlayer : MonoBehaviour
 {
     #region Inspector Properties
 
+    [Description("Only used in inspector to understand what this SFXPlayer is for. Gunshuts? Hurt sounds?")]
     public string SFXPlayerName;
     [SerializeField] private AudioClip[] clips;
     [Description("Audio source used for this SFX player. Defaults to whatever audio source is attached to this gameobject if not provided")]
