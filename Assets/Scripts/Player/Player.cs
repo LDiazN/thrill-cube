@@ -9,12 +9,15 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     #region Inspector properties
-    [SerializeField] private AudioSource playerAudioSource;
-    public AudioSource PlayerAudioSource => playerAudioSource;
-    
     [Header("Audio")]
     [Description("Played when hurt")]
     [SerializeField] private AudioClip[] hurtClips;
+    [SerializeField] private AudioSource playerAudioSource;
+    public AudioSource PlayerAudioSource => playerAudioSource;
+
+    [Description("Used for SFX inside the player")]
+    [SerializeField] private AudioSource playerSFX;
+    public AudioSource PlayerSFX => playerSFX;
     #endregion
     
     #region Components

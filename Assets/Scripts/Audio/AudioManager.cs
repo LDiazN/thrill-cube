@@ -8,6 +8,9 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource playerAudioSource;
     [Description("Used to spawn an audio source at a specified position, mostly for SFX")]
     [SerializeField] private AudioSource audioSourcePrefab;
+
+    [Description("Audio source used for SFX in the player, usually located at in the player itself")]
+    [SerializeField] private AudioSource playerSFXSource;
     
     #endregion
     
@@ -19,6 +22,7 @@ public class AudioManager : MonoBehaviour
     {
         var player = FindFirstObjectByType<Player>();
         playerAudioSource = player.PlayerAudioSource;
+        playerSFXSource = player.PlayerSFX;
     }
 
     private void Awake()
@@ -72,5 +76,20 @@ public class AudioManager : MonoBehaviour
         if (randomizePitch)
             audioSource.pitch = Random.Range(0.9f, 1.1f);
         Destroy(audioSource.gameObject, audioSource.clip.length);
+    }
+
+    /// <summary>
+    /// Play an SFX at the position of the player
+    /// </summary>
+    /// <param name="clip"></param>
+    /// <param name="volume"></param>
+    public static void PlaySFX(AudioClip clip, float volume = 1)
+    {
+        if (!Instance)
+            return;
+        
+        Instance.playerSFXSource.clip = clip;
+        
+        
     }
 }

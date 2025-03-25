@@ -10,9 +10,11 @@ public class Shoot : MonoBehaviour
     // Might be null if no weapon is attached
     [CanBeNull] public Gun Weapon;
     
-    
     [Description("Game object where the gun will be attached after changing weapons")] [SerializeField]
     private Transform weaponSlot;
+    
+    [Description("SFX player used for playing gun pick SFX")]
+    [CanBeNull] [SerializeField] private SFXPlayer gunPickSFX;
     
     #endregion
     
@@ -63,6 +65,12 @@ public class Shoot : MonoBehaviour
         System.Diagnostics.Debug.Assert(Weapon != null, nameof(Weapon) + " != null");
         Weapon.transform.localPosition = Vector3.zero;
         Weapon.transform.localRotation = Quaternion.identity;
+
+
+        if (gunPickSFX)
+            gunPickSFX.PlaySound();            
+        
+        // TODO convert weapon into world item 
         if (oldWeapon)
             Destroy(oldWeapon.gameObject);
     }
