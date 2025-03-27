@@ -12,11 +12,16 @@ public class PlayerInputController : PlayerController
     private InputAction _movementAction;
     private InputAction _attackAction;
     private InputAction _lookAction;
+    private InputAction _throwAction;
     
-    // -- Components ----------------------------------
+    #endregion
+    
+    # region Components
+    
     private PlayerMovement _playerMovement;
     private ThirdPersonCamera _tpCamera;
     private Shoot _shoot;
+    private Throw _throw;
 
     #endregion
 
@@ -25,20 +30,27 @@ public class PlayerInputController : PlayerController
         _playerMovement = GetComponent<PlayerMovement>();
         _tpCamera = GetComponent<ThirdPersonCamera>();
         _shoot = GetComponent<Shoot>();
+        _throw = GetComponent<Throw>();
     }
 
     void Start()
     {
         _movementAction = InputSystem.actions.FindAction("Move");
         _lookAction = InputSystem.actions.FindAction("Look");
+        _throwAction = InputSystem.actions.FindAction("SecondaryAttack");
         _attackAction = InputSystem.actions.FindAction("Attack");
+        
         _attackAction.performed += UpdateShoot;
+        _throwAction.performed += UpdateThrow;
+        
     }
 
     private void OnDisable()
     {
         if (_attackAction != null)
             _attackAction.performed -= UpdateShoot;
+        if (_throwAction != null)
+            _throwAction.performed -= UpdateThrow;
     }
 
     void Update()
@@ -70,5 +82,11 @@ public class PlayerInputController : PlayerController
     void UpdateShoot(InputAction.CallbackContext context)
     {
         _shoot.Fire();
+    }
+
+    void UpdateThrow(InputAction.CallbackContext context)
+    {
+        Debug.Log("Trying to throw");
+        _throw?.ThrowEquipment();
     }
 }

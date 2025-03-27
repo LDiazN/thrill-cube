@@ -36,6 +36,9 @@ public class Throwable : MonoBehaviour
 
     public void TurnOffPhysics()
     {
+        if (!_rigidbody)
+            _rigidbody = GetComponent<Rigidbody>();
+        
         _rigidbody.isKinematic = true;
         _rigidbody.useGravity = false;
         _collider.isTrigger = false;

@@ -133,4 +133,22 @@ public class ThirdPersonCamera : MonoBehaviour
         rotation.z = Mathf.SmoothDamp(rotation.z, desiredRotation, ref _tiltSmoothVelocity, 0.2f);
         followTarget.transform.rotation = Quaternion.Euler(rotation);
     }
+
+    /// <summary>
+    /// Return the position of the object being pointed by the camera.
+    /// The reticle's target
+    ///
+    /// If no target, will return a position at the infinite in the direction of the camera
+    /// </summary>
+    /// <returns>Position of the thing the camera is seeing right now</returns>
+    public Vector3 GetTarget()
+    {
+        // Try to shoot at  target very far away. If you find something else first, shoot at that 
+        var hitSomething = Physics.Raycast(GetCameraPosition(), GetCameraDirection(), out RaycastHit hit);
+        if (hitSomething) 
+            return hit.point;
+        
+        // Didn't find anything, shoot at the infinite void
+        return GetCameraPosition() + 1000 * GetCameraDirection();
+    }
 }

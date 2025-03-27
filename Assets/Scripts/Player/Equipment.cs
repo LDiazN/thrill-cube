@@ -16,9 +16,11 @@ public class Equipment : MonoBehaviour
     [Description("Currently equiped object")]
     [SerializeField] private GameObject currentlyEquippedObject;
 
-    [Header("Debug")] 
-    [Description("A prefab used to equip a throwable in debug mode")]
-    [SerializeField] private Throwable exampleThrowable;
+    [Description("SFX player used for playing gun pick SFX")]
+    [CanBeNull] [SerializeField] private SFXPlayer gunPickSFX;
+    
+    [Description("Throw force when unequiping this item and launching it into the air")]
+    [SerializeField] private float throwForce;
 
     #endregion
 
@@ -32,41 +34,107 @@ public class Equipment : MonoBehaviour
 
     #endregion
 
+    #region Internal State
+
+    [CanBeNull] public Gun currentGun;
+    [CanBeNull] public Throwable currenThrowable;
+    
+    #endregion
+    
     private void Awake()
     {
-        SetUpEquipment();
+        SetupEquipment();
     }
     
     [ContextMenu("Set up equipment")]
-    public void SetUpEquipment()
+    public void SetUpEquipmentInEditor()
     {
-        _shoot = GetComponent<Shoot>();
         _throw = GetComponent<Throw>();
+        _shoot = GetComponent<Shoot>();
         
-        var gun = currentlyEquippedObject.GetComponent<Gun>();
-        if (gun && _shoot)
-            _shoot.SetWeapon(gun);
+        if (equipmentSocket.transform.childCount == 0)
+            return;
+
+        var possibleEquipment = equipmentSocket.transform.GetChild(0);
+        currentlyEquippedObject = possibleEquipment.gameObject;
         
-        var throwable = currentlyEquippedObject.GetComponent<Throwable>();
-        if (throwable && _throw)
-            _throw.SetThrowable(throwable);
+        SetupEquipment();
     }
 
-    private void Equip(GameObject equipable)
+    public void Equip([CanBeNull] GameObject equipable)
     {
-        // If gun, defer this work to the shoot component
-        var gun = equipable.GetComponent<Gun>();
+        // Unequip whatever you have
+        Unequip();
+        
+        // equipable can be either prefab, gameobject, or null
+        GameObject toEquip = equipable && equipable.scene.IsValid() ? equipable : Instantiate(equipable); ;
 
-        if (gun && _shoot)
+        if (toEquip)
         {
-            _shoot.SetWeapon(gun);
+            toEquip.transform.SetParent(equipmentSocket.transform);
+            toEquip.transform.localPosition = Vector3.zero;
+            currentGun = toEquip.GetComponent<Gun>();
+        
+            // If not a gun or the character can't shoot, add it as a throwable
+            currenThrowable = toEquip.GetComponent<Throwable>();
+            if (currenThrowable&& _throw)
+            {
+                _throw.SetUpThrowable(currenThrowable);                        
+            }
+            
+            // If it does have a rigidbody, neutralize it
+            var equipRb = toEquip.GetComponent<Rigidbody>();
+            var equipCol = toEquip.GetComponent<Collider>();
+            if (equipRb)
+            {
+                equipRb.isKinematic = true;
+                equipRb.useGravity = false;
+            }
+            if (equipRb)
+                equipCol.enabled = false;
+            
+            SetupEquipment();
         }
         
-        // If not a gun or the character can't shoot, add it as a throwable
-        var throwable = equipable.GetComponent<Throwable>();
-        if (throwable && _throw)
+        currentlyEquippedObject = toEquip;
+            
+        if (equipable)
+            gunPickSFX?.PlaySound();
+    }
+
+    public void Unequip(bool shouldThrow = true)
+    {
+        if (!currentlyEquippedObject)
+            return;
+        
+        var oldObject = currentlyEquippedObject;
+        oldObject.transform.SetParent(null);
+        var objRigidbody = oldObject.GetComponent<Rigidbody>();
+        if (objRigidbody && shouldThrow)
+            TryThrowObject(objRigidbody);
+
+        currentlyEquippedObject = null;
+        currentGun = null;
+        currenThrowable = null;
+    }
+
+    public void SetupEquipment()
+    {
+        _throw = GetComponent<Throw>();
+        _shoot = GetComponent<Shoot>();
+        if (currentlyEquippedObject)
         {
-            _throw.SetThrowable(throwable);                        
+            currentGun = currentlyEquippedObject.GetComponent<Gun>();
+            currenThrowable = currentlyEquippedObject.GetComponent<Throwable>();
         }
+    }
+
+    private void TryThrowObject(Rigidbody objRb)
+    {
+        // Throw object into the air if possible
+        objRb.isKinematic = false;
+        var direction = transform.up + transform.right;
+        direction.Normalize();
+        objRb.AddForce(direction * throwForce);
     }
 }

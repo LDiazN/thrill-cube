@@ -36,6 +36,9 @@ public class Player : MonoBehaviour
     
     PlayerMovement _playerMovement;
     public PlayerMovement PlayerMovement => _playerMovement;
+    
+    Equipment _equipment;
+    public Equipment Equipment => _equipment;
 
     #endregion
 
@@ -46,6 +49,7 @@ public class Player : MonoBehaviour
         _throw = GetComponent<Throw>();
         _rigidbody = GetComponent<Rigidbody>();
         _playerMovement = GetComponent<PlayerMovement>();
+        _equipment = GetComponent<Equipment>();
         
         if(!playerAudioSource)
             Debug.LogWarning("No player audio source set up in inspector!");

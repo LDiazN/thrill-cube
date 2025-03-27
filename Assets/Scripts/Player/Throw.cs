@@ -1,7 +1,11 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
+using UnityEditor;
 using UnityEngine;
 
+[RequireComponent(typeof(ThirdPersonCamera))]
 public class Throw : MonoBehaviour
 {
     #region Inspector Variables
@@ -9,18 +13,19 @@ public class Throw : MonoBehaviour
     [Description("Game object where the throwable will be attached after changing weapons")] [SerializeField]
     private Transform equipmentSlot;
 
-    [Description("How strong to throw the throwable away when unequiping it")] [SerializeField]
-    private float unequipForce = 20;
-    
     [Description("How strong to throw the throwable away when actually throwing it")] [SerializeField]
     private float throwForce = 100;
     
     #endregion
     
-    #region Internal State
-    // Can be either gameobject or prefab
-    Throwable _throwable = null;
+    #region Components
+    
+    ThirdPersonCamera _tpsCamera;
+    
+    Equipment _equipment;
+    
     #endregion
+    
     
     #region Callbacks
 
@@ -28,53 +33,47 @@ public class Throw : MonoBehaviour
     
     #endregion
 
-    public void SetThrowable(Throwable throwable)
+    private void Awake()
     {
-        if (_throwable == throwable) // Nothing to do
-            return; 
-        
-        if (!_throwable)
-            Unequip();            
-        
-        _throwable = throwable;
-        _throwable.transform.SetParent(equipmentSlot.transform);
-        _throwable.transform.localPosition = Vector3.zero;
-        
-        var throwableComponent = _throwable.GetComponent<Throwable>();
-        if (throwableComponent)
+        _tpsCamera = GetComponent<ThirdPersonCamera>();
+        _equipment = GetComponent<Equipment>();
+    }
+
+    public void SetUpThrowable(Throwable throwable)
+    {
+        if (throwable)
         {
-            throwableComponent.owner = gameObject;
-            throwableComponent.TurnOffPhysics();
+            throwable.owner = gameObject;
+            throwable.TurnOffPhysics();
         }
     }
 
-    public void ThrowEquipment(Vector3 direction)
+    public void ThrowEquipment()
     {
-        _throwable.transform.parent = null;
-        var throwableComponent = _throwable.GetComponent<Throwable>();
+        ThrowEquipment(_tpsCamera.GetTarget());
+    }
+    
+    public void ThrowEquipment(Vector3 target)
+    {
+        if (!_equipment.currenThrowable)
+            return;
+        
+        var direction = target - transform.position;
+        direction.Normalize();
+
+        var throwable = _equipment.currenThrowable;
+        var throwableComponent = throwable.GetComponent<Throwable>();
         var rigidBody = throwableComponent.GetComponent<Rigidbody>();
         
         throwableComponent.SetUpThrow();
         
-        _throwable.transform.SetParent(null);
-        _throwable.transform.position += transform.forward;
+        throwable.transform.SetParent(null);
+        throwable.transform.position += transform.forward;
         
         rigidBody.AddForce(direction * throwForce, ForceMode.Impulse);
         
+        _equipment.Unequip(false);
+        
         OnThrow?.Invoke();
-    }
-
-    private void Unequip()
-    {
-        _throwable.transform.parent = null;
-        
-        // Launch it into the air if has rigidbody
-        var rigidBody = _throwable.GetComponent<Rigidbody>();
-        rigidBody.isKinematic = false;
-        rigidBody.useGravity = true;
-        var direction = Vector3.up + Vector3.right;
-        direction.Normalize();
-        
-        rigidBody.AddForce(direction * unequipForce, ForceMode.Impulse);
     }
 }

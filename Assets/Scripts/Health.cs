@@ -60,7 +60,7 @@ public class Health : MonoBehaviour
         _currentHealth = _maxHealth;
     }
 
-    public void TakeDamage(int damage, Vector3 hitDirection = new Vector3(), float knockback = 0f,
+    public void TakeDamage(int damage, Vector3 hitDirection = new(), float knockback = 0f,
         float knockbackOnDead = 0f, GameObject perpetrator = null)
     {
         damage = immortal && damage > 0 ? 0 : damage;

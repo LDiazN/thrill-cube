@@ -15,6 +15,9 @@ GameObject:
   - component: {fileID: 1823648578542419800}
   - component: {fileID: 5853462003341289828}
   - component: {fileID: 2074101455108683815}
+  - component: {fileID: 5557580824855810329}
+  - component: {fileID: 3753861575416671291}
+  - component: {fileID: 712654084200675064}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -255,6 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf09854481190d4d97fe5c94bdc1874, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SFXPlayerName: 
   clips:
   - {fileID: 8300000, guid: 83f8e32368bf0324f8687b2c52e52bc0, type: 3}
   - {fileID: 8300000, guid: 14bf14f189412c34583a7eaa8658868a, type: 3}
@@ -262,6 +266,70 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e33e9011774f3ec479eb19435700527d, type: 3}
   - {fileID: 8300000, guid: 1dea84002d24b7344bba8715a318d01a, type: 3}
   - {fileID: 8300000, guid: ace3948c0b825bd4a9318076359d2777, type: 3}
+  audioSource: {fileID: 0}
+--- !u!54 &5557580824855810329
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6445032975453214688}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &3753861575416671291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6445032975453214688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3640fac8e8374a849a33c7561998442f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 2
+  knockback: 15
+  owner: {fileID: 0}
+--- !u!65 &712654084200675064
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6445032975453214688}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 0.28, y: 0.16, z: 0.14}
+  m_Center: {x: 0, y: -0.03, z: 0}
 --- !u!1001 &3555870370855830222
 PrefabInstance:
   m_ObjectHideFlags: 0

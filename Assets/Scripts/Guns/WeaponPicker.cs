@@ -15,10 +15,15 @@ public class WeaponPicker : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         var player = other.GetComponent<Player>();
-        if (!player || !(player.Shoot.Weapon && player.Shoot.Weapon.IsEmpty()))
+        if (!player)
             return;
-
-        player.Shoot.SetWeapon(gun);
+        
+        var playerHasGun = player.Equipment.currentGun != null;
+        var gunHasAmmo = playerHasGun && !player.Equipment.currentGun.IsEmpty();
+        if (playerHasGun && gunHasAmmo)
+            return;
+        
+        player.Equipment.Equip(gun.gameObject);
         Destroy(gameObject);
     }
 

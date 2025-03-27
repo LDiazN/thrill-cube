@@ -87,6 +87,7 @@ public class Gun : MonoBehaviour
     {
         if (_timeSinceLastShot < fireRate)
             return;
+        
         if (_currentAmmo == 0 && !infiniteAmmo)
         {
             OnShoot?.Invoke(false);
@@ -96,7 +97,9 @@ public class Gun : MonoBehaviour
         _timeSinceLastShot = 0;
         SpawnBullet(target, owner);
         ScreenShake();
-        _currentAmmo = Mathf.Max(_currentAmmo - 1, 0);
+        
+        if (!infiniteAmmo)
+            _currentAmmo = Mathf.Max(_currentAmmo - 1, 0);
         
         OnShoot?.Invoke(true);
     }
