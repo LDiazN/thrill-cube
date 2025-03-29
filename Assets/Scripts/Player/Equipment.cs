@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Manages what the player has in its hands right now
@@ -41,8 +42,15 @@ public class Equipment : MonoBehaviour
     /// <summary>
     /// An object that can be picked by the player if he wants to, normally part of a pickable
     /// </summary>
+    [FormerlySerializedAs("CanPick")]
     [HideInInspector]
-    [CanBeNull] public WeaponPicker CanPick;
+    [CanBeNull] public WeaponPicker canPickFromPicker;
+    
+    /// <summary>
+    /// An object in the floor that could be picked by the character
+    /// </summary>
+    [HideInInspector]
+    [CanBeNull] public Equipable canPickFromFloor;
     
     #endregion
     
@@ -168,20 +176,34 @@ public class Equipment : MonoBehaviour
         objRb.AddForce(direction * throwForce, ForceMode.Impulse);
     }
 
-    public void TryEquipFromPicker()
+    public bool TryEquipFromPicker()
     {
-        if (!CanPick)
-            return;
+        if (!canPickFromPicker)
+            return false;
         
         Unequip();
-        Equip(CanPick.RetrieveWeapon(true));
-        CanPick = null;
+        Equip(canPickFromPicker.RetrieveWeapon(true));
+        canPickFromPicker = null;
+        return true;
+    }
+
+    public bool TryEquipFromFloor()
+    {
+        if (!canPickFromFloor) return false;
+        
+        Unequip();
+        Equip(canPickFromFloor);
+        canPickFromFloor = null;
+
+        return true;
     }
 
     public void UpdateQuickChange()
     {
         if ((currentGun && currentGun.IsEmpty()) || !currentlyEquippedObject)
+        {
             TryEquipFromPicker();
+        }
             
     }
 }

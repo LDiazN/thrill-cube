@@ -24,7 +24,7 @@ public class WeaponPicker : MonoBehaviour
         // if (playerHasGun && gunHasAmmo)
         //     return;
 
-        player.Equipment.CanPick = this;
+        player.Equipment.canPickFromPicker = this;
     }
 
     private void OnTriggerExit(Collider other)
@@ -33,8 +33,8 @@ public class WeaponPicker : MonoBehaviour
         if (!player)
             return;
         
-        if (player.Equipment.CanPick == this)
-            player.Equipment.CanPick = null;
+        if (player.Equipment.canPickFromPicker == this)
+            player.Equipment.canPickFromPicker = null;
     }
 
     /// <summary>

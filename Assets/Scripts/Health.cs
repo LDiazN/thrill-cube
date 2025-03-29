@@ -87,4 +87,9 @@ public class Health : MonoBehaviour
     {
         TakeDamage(1);
     }
+
+    public void Kill(Vector3 hitDirection = new(), float knockback = 0f, float knockbackOnDead = 0f)
+    {
+        TakeDamage(_currentHealth, hitDirection, knockback, knockbackOnDead);
+    }
 }

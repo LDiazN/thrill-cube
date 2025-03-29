@@ -26,15 +26,15 @@ public class EnemyCounter : BaseUIComponent
         gameObject.SetActive(false);
     }
 
-    protected override void RegisterEvents(GameManager gameManager)
+    protected override void RegisterEvents(KillAllEnemiesGameManager killAllEnemiesGameManager)
     {
-        base.RegisterEvents(gameManager);
-        gameManager.OnEnemyCountChanged += SetEnemyCount;
+        base.RegisterEvents(killAllEnemiesGameManager);
+        killAllEnemiesGameManager.OnEnemyCountChanged += SetEnemyCount;
     }
 
-    protected override void DeregisterEvents(GameManager gameManager)
+    protected override void DeregisterEvents(KillAllEnemiesGameManager killAllEnemiesGameManager)
     {
-        base.DeregisterEvents(gameManager);
-        gameManager.OnEnemyCountChanged -= SetEnemyCount;
+        base.DeregisterEvents(killAllEnemiesGameManager);
+        killAllEnemiesGameManager.OnEnemyCountChanged -= SetEnemyCount;
     }
 }

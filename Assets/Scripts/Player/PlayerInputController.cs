@@ -77,7 +77,10 @@ public class PlayerInputController : PlayerController
 
     void UpdateShoot(InputAction.CallbackContext context)
     {
-        _player.Shoot.Fire();
+        if (_player.Equipment.currentGun)
+            _player.Shoot.Fire();
+        else if (_player.Equipment.currenThrowable)
+            _player.Throw.ThrowEquipment();
     }
 
     void UpdateThrow(InputAction.CallbackContext context)
@@ -89,6 +92,7 @@ public class PlayerInputController : PlayerController
     void UpdatePick(InputAction.CallbackContext context)
     {
        Debug.Log("Trying to pick");
-       _player.Equipment.TryEquipFromPicker();
+       if (!_player.Equipment.TryEquipFromPicker())
+           _player.Equipment.TryEquipFromFloor();
     }
 }

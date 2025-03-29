@@ -13,12 +13,14 @@ public class Throwable : MonoBehaviour
     
     [Description("How much knockback does this object do when hitting an enemy")] [SerializeField]
     private float knockback;
+
+    [Description("Sphere collider set as trigger used to detect the player")] [SerializeField]
+    private TriggerEnterCallback pickRange;
     
     #endregion 
     
     #region Components
     Rigidbody _rigidbody;
-    Collider _collider;
     Equipable _equipable;
     public Equipable Equipable => _equipable;
     #endregion
@@ -33,8 +35,23 @@ public class Throwable : MonoBehaviour
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
-        _collider = GetComponent<Collider>();
         _equipable = GetComponent<Equipable>();
+    }
+
+    private void OnEnable()
+    {
+        if (!pickRange)
+            return;
+        pickRange.OnTriggerEnterEvent += OnPickRangeTriggerEnter;
+        pickRange.OnTriggerExitEvent += OnPickRangeTriggerExit;
+    }
+    
+    private void OnDisable()
+    {
+        if (!pickRange)
+            return;
+        pickRange.OnTriggerEnterEvent -= OnPickRangeTriggerEnter;
+        pickRange.OnTriggerExitEvent -= OnPickRangeTriggerExit;
     }
 
     public void SetCanHurt(bool canHurt) => _canHurt = canHurt;
@@ -59,5 +76,25 @@ public class Throwable : MonoBehaviour
         
         // TODO set perpetrator as player
         health.TakeDamage(damage, _rigidbody.linearVelocity.normalized, knockback, 3 * knockback, owner);
+    }
+
+    private void OnPickRangeTriggerEnter(Collider other)
+    {
+        Debug.Log("Pick range trigger");
+        var equipment = other.gameObject.GetComponent<Equipment>();
+        if (!equipment)
+            return;
+
+        equipment.canPickFromFloor = _equipable;
+    }
+
+    private void OnPickRangeTriggerExit(Collider other)
+    {
+        var equipment = other.gameObject.GetComponent<Equipment>();
+        if (!equipment)
+            return;
+        
+        if (equipment.canPickFromFloor == _equipable)
+            equipment.canPickFromFloor = null;
     }
 }

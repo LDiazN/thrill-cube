@@ -3,36 +3,36 @@ using UnityEngine;
 public abstract class BaseUIComponent : MonoBehaviour
 {
     #region Related Game Objects
-    GameManager gameManager;
+    KillAllEnemiesGameManager _killAllEnemiesGameManager;
     #endregion
     
     private void Awake()
     {
-        gameManager = FindFirstObjectByType<GameManager>();
+        _killAllEnemiesGameManager = FindFirstObjectByType<KillAllEnemiesGameManager>();
     }
     
     private void OnEnable()
     {
-        if (gameManager != null)
-            RegisterEvents(gameManager);
+        if (_killAllEnemiesGameManager != null)
+            RegisterEvents(_killAllEnemiesGameManager);
     }
     
     private void OnDisable()
     {
-        if (gameManager != null)
-            DeregisterEvents(gameManager);
+        if (_killAllEnemiesGameManager != null)
+            DeregisterEvents(_killAllEnemiesGameManager);
     }
 
-    protected virtual void RegisterEvents(GameManager gameManager)
+    protected virtual void RegisterEvents(KillAllEnemiesGameManager killAllEnemiesGameManager)
     {
-        gameManager.OnLose += OnLose;
-        gameManager.OnWin += OnWin;
+        killAllEnemiesGameManager.OnLose += OnLose;
+        killAllEnemiesGameManager.OnWin += OnWin;
     }
 
-    protected virtual void DeregisterEvents(GameManager gameManager)
+    protected virtual void DeregisterEvents(KillAllEnemiesGameManager killAllEnemiesGameManager)
     {
-        gameManager.OnLose -= OnLose;
-        gameManager.OnWin -= OnWin;
+        killAllEnemiesGameManager.OnLose -= OnLose;
+        killAllEnemiesGameManager.OnWin -= OnWin;
     }
 
     protected virtual void OnLose()
