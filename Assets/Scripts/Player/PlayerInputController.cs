@@ -13,24 +13,19 @@ public class PlayerInputController : PlayerController
     private InputAction _attackAction;
     private InputAction _lookAction;
     private InputAction _throwAction;
+    private InputAction _interactAction;
     
     #endregion
     
     # region Components
-    
-    private PlayerMovement _playerMovement;
-    private ThirdPersonCamera _tpCamera;
-    private Shoot _shoot;
-    private Throw _throw;
+
+    private Player _player;
 
     #endregion
 
     private void Awake()
     {
-        _playerMovement = GetComponent<PlayerMovement>();
-        _tpCamera = GetComponent<ThirdPersonCamera>();
-        _shoot = GetComponent<Shoot>();
-        _throw = GetComponent<Throw>();
+        _player = GetComponent<Player>();
     }
 
     void Start()
@@ -39,10 +34,11 @@ public class PlayerInputController : PlayerController
         _lookAction = InputSystem.actions.FindAction("Look");
         _throwAction = InputSystem.actions.FindAction("SecondaryAttack");
         _attackAction = InputSystem.actions.FindAction("Attack");
+        _interactAction = InputSystem.actions.FindAction("Interact");
         
         _attackAction.performed += UpdateShoot;
         _throwAction.performed += UpdateThrow;
-        
+        _interactAction.performed += UpdatePick;
     }
 
     private void OnDisable()
@@ -62,13 +58,13 @@ public class PlayerInputController : PlayerController
     void UpdateCameraMovement()
     {
         var lookOffset = _lookAction.ReadValue<Vector2>();
-        _tpCamera.CameraMovement = lookOffset;
+        _player.TPSCamera.CameraMovement = lookOffset;
     }
     
     void UpdatePlayerMovement()
     {
         var movementDirection = GetMovementDirection();
-        _playerMovement.MovementDirection = movementDirection;
+        _player.PlayerMovement.MovementDirection = movementDirection;
     }
 
     Vector3 GetMovementDirection()
@@ -81,12 +77,18 @@ public class PlayerInputController : PlayerController
 
     void UpdateShoot(InputAction.CallbackContext context)
     {
-        _shoot.Fire();
+        _player.Shoot.Fire();
     }
 
     void UpdateThrow(InputAction.CallbackContext context)
     {
         Debug.Log("Trying to throw");
-        _throw?.ThrowEquipment();
+        _player.Throw?.ThrowEquipment();
+    }
+
+    void UpdatePick(InputAction.CallbackContext context)
+    {
+       Debug.Log("Trying to pick");
+       _player.Equipment.TryEquipFromPicker();
     }
 }

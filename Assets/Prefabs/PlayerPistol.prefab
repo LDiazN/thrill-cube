@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 5557580824855810329}
   - component: {fileID: 3753861575416671291}
   - component: {fileID: 712654084200675064}
+  - component: {fileID: 4536707827027837559}
   m_Layer: 6
   m_Name: PlayerPistol
   m_TagString: Untagged
@@ -53,11 +54,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a1f110cac6fb84cab9d29eda4c73ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  generatePicker: 1
   fireRate: 0.15
   bulletPrefab: {fileID: 4583260921117651165, guid: eb3a68476d5721942ae49c73d5bcfc2f, type: 3}
   bulletSpawnPoint: {fileID: 1101712839139967355}
   knockBackForce: 5
   knockBackForceOnDead: 20
+  weaponPicker: {fileID: 7848474495450890841, guid: 3b0be7a50a264fc46acc8ede80efcce6, type: 3}
   magSize: 10
   infiniteAmmo: 0
   noAmmoSound: {fileID: 8300000, guid: 8f4a8ec3fea8edb4ea14dc1b78600b2c, type: 3}
@@ -330,6 +333,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.28, y: 0.16, z: 0.14}
   m_Center: {x: 0, y: -0.03, z: 0}
+--- !u!114 &4536707827027837559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6445032975453214688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a965e9028ed175a42a5796ecddf315e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isEquiped: 0
 --- !u!1001 &3555870370855830222
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -38,6 +38,11 @@ public class Equipment : MonoBehaviour
 
     [CanBeNull] public Gun currentGun;
     [CanBeNull] public Throwable currenThrowable;
+    /// <summary>
+    /// An object that can be picked by the player if he wants to, normally part of a pickable
+    /// </summary>
+    [HideInInspector]
+    [CanBeNull] public WeaponPicker CanPick;
     
     #endregion
     
@@ -51,7 +56,12 @@ public class Equipment : MonoBehaviour
     {
         SetupEquipment();
     }
-    
+
+    private void Update()
+    {
+        UpdateQuickChange();
+    }
+
     [ContextMenu("Set up equipment")]
     public void SetUpEquipmentInEditor()
     {
@@ -149,10 +159,29 @@ public class Equipment : MonoBehaviour
 
     private void TryThrowObject(Rigidbody objRb)
     {
+        var gun = objRb.GetComponent<Gun>();
+        gun?.StartPickableTimer();
+        
         // Throw object into the air if possible
-        objRb.isKinematic = false;
         var direction = transform.up + transform.right;
         direction.Normalize();
-        objRb.AddForce(direction * throwForce);
+        objRb.AddForce(direction * throwForce, ForceMode.Impulse);
+    }
+
+    public void TryEquipFromPicker()
+    {
+        if (!CanPick)
+            return;
+        
+        Unequip();
+        Equip(CanPick.RetrieveWeapon(true));
+        CanPick = null;
+    }
+
+    public void UpdateQuickChange()
+    {
+        if ((currentGun && currentGun.IsEmpty()) || !currentlyEquippedObject)
+            TryEquipFromPicker();
+            
     }
 }

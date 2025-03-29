@@ -379,11 +379,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   equipmentSocket: {fileID: 455668174758758955}
-  currentlyEquippedObject: {fileID: 6646817886333012429}
+  currentlyEquippedObject: {fileID: 4304026472374099034}
   gunPickSFX: {fileID: 2438282808253184924}
   throwForce: 0
   currentGun: {fileID: 7316304808308389308}
   currenThrowable: {fileID: 3555314590385713686}
+  CanPick: {fileID: 0}
 --- !u!114 &8500137306815255148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -901,6 +902,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 455668174758758955}
     m_Modifications:
+    - target: {fileID: 4536707827027837559, guid: 79d81990b10dd2d44b5753029d9069e6, type: 3}
+      propertyPath: isEquiped
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5557580824855810329, guid: 79d81990b10dd2d44b5753029d9069e6, type: 3}
       propertyPath: m_UseGravity
       value: 0
@@ -963,23 +968,29 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3753861575416671291, guid: 79d81990b10dd2d44b5753029d9069e6, type: 3}
   m_PrefabInstance: {fileID: 382637737444302381}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6646817886333012429}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3640fac8e8374a849a33c7561998442f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &6646817886333012429 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6445032975453214688, guid: 79d81990b10dd2d44b5753029d9069e6, type: 3}
+--- !u!114 &4304026472374099034 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4536707827027837559, guid: 79d81990b10dd2d44b5753029d9069e6, type: 3}
   m_PrefabInstance: {fileID: 382637737444302381}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a965e9028ed175a42a5796ecddf315e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7316304808308389308 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6973782839040076689, guid: 79d81990b10dd2d44b5753029d9069e6, type: 3}
   m_PrefabInstance: {fileID: 382637737444302381}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6646817886333012429}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b4a1f110cac6fb84cab9d29eda4c73ad, type: 3}

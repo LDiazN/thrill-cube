@@ -1,5 +1,7 @@
+using System.Collections;
 using System;
 using System.ComponentModel;
+using JetBrains.Annotations;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -7,6 +9,9 @@ using UnityEngine;
 public class Gun : MonoBehaviour
 {
     #region Inspector Properties
+
+    [Description("If this weapon should generate a weapon picker when stopped")] [SerializeField]
+    private bool generatePicker = false;
     
     [Description("How many seconds to wait between shots")]
     [SerializeField]
@@ -27,6 +32,9 @@ public class Gun : MonoBehaviour
     [Description("Force to apply in the direction of the shot when the enemy dies")] [SerializeField]
     private float knockBackForceOnDead = 20;
 
+    [Description("Pickable to place in this gun's position when the gun is trown away")] [SerializeField]
+    private WeaponPicker weaponPicker;
+
     [Header("Ammo")]
     [Description("How many bullets does this weapon have on start")] [SerializeField]
     private int magSize = 10;
@@ -41,6 +49,8 @@ public class Gun : MonoBehaviour
     #region Components 
     CinemachineImpulseSource _impulseSource;
     SFXPlayer _sfxPlayer;
+    [CanBeNull] Equipable _equipable;
+    [CanBeNull] Rigidbody _rigidbody;
     #endregion
     
     #region Callbacks
@@ -55,12 +65,16 @@ public class Gun : MonoBehaviour
 
     public int _currentAmmo;
     public int CurrentAmmo => _currentAmmo;
+
+    private bool _canBecomePickable;
     #endregion
 
     private void Awake()
     {
         _impulseSource = GetComponent<CinemachineImpulseSource>();
         _sfxPlayer = GetComponent<SFXPlayer>();
+        _equipable = GetComponent<Equipable>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void OnEnable()
@@ -76,6 +90,7 @@ public class Gun : MonoBehaviour
     private void Update()
     {
         _timeSinceLastShot += Time.deltaTime;
+        UpdateEquipableGun();
     }
 
     /// <summary>
@@ -143,5 +158,39 @@ public class Gun : MonoBehaviour
     public bool IsEmpty()
     {
         return _currentAmmo == 0;
+    }
+
+    private void CreateWeaponPicker()
+    {
+        var picker = Instantiate(weaponPicker);
+        picker.transform.position = transform.position;
+        picker.SetGun(this);
+    }
+
+    private void UpdateEquipableGun()
+    {
+        if (!_equipable || !_rigidbody || !generatePicker || IsEmpty() || !_canBecomePickable)
+            return;
+
+        if (_equipable.IsEquiped)
+            return;
+        
+        // if not equiped and rigidbody says it's stopped, create a pickable object
+        if (_rigidbody.linearVelocity.magnitude <= 0.01f)
+        {
+            CreateWeaponPicker();
+        }
+    }
+
+    public void StartPickableTimer()
+    {
+        StartCoroutine(PickableTimer(1));
+    }
+
+    private IEnumerator PickableTimer(float time)
+    {
+        _canBecomePickable = false;
+        yield return new WaitForSeconds(time);
+        _canBecomePickable = true;
     }
 }

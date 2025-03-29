@@ -39,6 +39,9 @@ public class Player : MonoBehaviour
     
     Equipment _equipment;
     public Equipment Equipment => _equipment;
+    
+    ThirdPersonCamera _tpsCamera;
+    public ThirdPersonCamera TPSCamera => _tpsCamera;
 
     #endregion
 
@@ -50,6 +53,7 @@ public class Player : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _playerMovement = GetComponent<PlayerMovement>();
         _equipment = GetComponent<Equipment>();
+        _tpsCamera = GetComponent<ThirdPersonCamera>();
         
         if(!playerAudioSource)
             Debug.LogWarning("No player audio source set up in inspector!");

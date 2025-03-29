@@ -72,6 +72,13 @@ public class Throw : MonoBehaviour
         throwable.transform.position = oldPosition + transform.forward;
         rigidBody.AddForce(direction * throwForce, ForceMode.Impulse);
         
+        // This is a hack to prevent the velocity to be 0 
+        // when throwing the weapon
+        rigidBody.linearVelocity = transform.forward * 0.2f;
+
+        var gun = throwable.GetComponent<Gun>();
+        gun?.StartPickableTimer();
+        
         OnThrow?.Invoke();
     }
 }
