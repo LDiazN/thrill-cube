@@ -599,7 +599,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3900558709030951945, guid: ac125b3f56dfd6e4cb57b7a04d287d0f, type: 3}
       propertyPath: infiniteAmmo
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087918874556548182, guid: ac125b3f56dfd6e4cb57b7a04d287d0f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.33
       objectReference: {fileID: 0}
     - target: {fileID: 4602451099656517878, guid: ac125b3f56dfd6e4cb57b7a04d287d0f, type: 3}
       propertyPath: currentGun
@@ -629,6 +633,10 @@ PrefabInstance:
       propertyPath: throwable
       value: 
       objectReference: {fileID: 2020783246}
+    - target: {fileID: 8500137306815255148, guid: ac125b3f56dfd6e4cb57b7a04d287d0f, type: 3}
+      propertyPath: throwForce
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 8804732737197812965, guid: ac125b3f56dfd6e4cb57b7a04d287d0f, type: 3}
       propertyPath: _maxHealth
       value: 7

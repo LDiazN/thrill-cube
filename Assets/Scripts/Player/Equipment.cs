@@ -14,7 +14,7 @@ public class Equipment : MonoBehaviour
     private Transform equipmentSocket;
     
     [Description("Currently equiped object")]
-    [SerializeField] private GameObject currentlyEquippedObject;
+    [SerializeField] private Equipable currentlyEquippedObject;
 
     [Description("SFX player used for playing gun pick SFX")]
     [CanBeNull] [SerializeField] private SFXPlayer gunPickSFX;
@@ -41,6 +41,12 @@ public class Equipment : MonoBehaviour
     
     #endregion
     
+    #region Callbacks
+
+    public Action<Equipable> OnEquip;
+    
+    #endregion
+    
     private void Awake()
     {
         SetupEquipment();
@@ -56,23 +62,33 @@ public class Equipment : MonoBehaviour
             return;
 
         var possibleEquipment = equipmentSocket.transform.GetChild(0);
-        currentlyEquippedObject = possibleEquipment.gameObject;
+        currentlyEquippedObject = possibleEquipment.gameObject.GetComponent<Equipable>();
         
         SetupEquipment();
     }
 
     public void Equip([CanBeNull] GameObject equipable)
     {
+        if (equipable)
+        {
+            var equipComponent = equipable.GetComponent<Equipable>();
+            Equip(equipComponent);
+        }
+        else 
+            Equip((Equipable) null);
+    }
+    
+    public void Equip([CanBeNull] Equipable equipable)
+    {
         // Unequip whatever you have
         Unequip();
         
         // equipable can be either prefab, gameobject, or null
-        GameObject toEquip = equipable && equipable.scene.IsValid() ? equipable : Instantiate(equipable); ;
+        Equipable toEquip = equipable && equipable.gameObject.scene.IsValid() ? equipable : Instantiate(equipable); ;
 
         if (toEquip)
         {
-            toEquip.transform.SetParent(equipmentSocket.transform);
-            toEquip.transform.localPosition = Vector3.zero;
+            toEquip.Equip(equipmentSocket);
             currentGun = toEquip.GetComponent<Gun>();
         
             // If not a gun or the character can't shoot, add it as a throwable
@@ -100,6 +116,8 @@ public class Equipment : MonoBehaviour
             
         if (equipable)
             gunPickSFX?.PlaySound();
+        
+        OnEquip?.Invoke(toEquip);
     }
 
     public void Unequip(bool shouldThrow = true)
@@ -108,7 +126,7 @@ public class Equipment : MonoBehaviour
             return;
         
         var oldObject = currentlyEquippedObject;
-        oldObject.transform.SetParent(null);
+        oldObject.Unequip();
         var objRigidbody = oldObject.GetComponent<Rigidbody>();
         if (objRigidbody && shouldThrow)
             TryThrowObject(objRigidbody);

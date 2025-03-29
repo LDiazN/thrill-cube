@@ -3,7 +3,7 @@ using System.ComponentModel;
 using JetBrains.Annotations;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(Equipable))]
 public class Throwable : MonoBehaviour
 {
     #region Inspector Variables
@@ -19,6 +19,8 @@ public class Throwable : MonoBehaviour
     #region Components
     Rigidbody _rigidbody;
     Collider _collider;
+    Equipable _equipable;
+    public Equipable Equipable => _equipable;
     #endregion
     
     #region Internal State
@@ -32,30 +34,13 @@ public class Throwable : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
-    }
-
-    public void TurnOffPhysics()
-    {
-        if (!_rigidbody)
-            _rigidbody = GetComponent<Rigidbody>();
-        
-        _rigidbody.isKinematic = true;
-        _rigidbody.useGravity = false;
-        _collider.isTrigger = false;
-    }
-
-    public void TurnOnPhysics()
-    {
-        _rigidbody.isKinematic = false;
-        _rigidbody.useGravity = true;
-        _collider.isTrigger = false;
+        _equipable = GetComponent<Equipable>();
     }
 
     public void SetCanHurt(bool canHurt) => _canHurt = canHurt;
 
     public void SetUpThrow()
     {
-        TurnOnPhysics();
         SetCanHurt(true);
     }
     

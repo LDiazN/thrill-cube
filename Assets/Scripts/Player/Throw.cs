@@ -44,7 +44,6 @@ public class Throw : MonoBehaviour
         if (throwable)
         {
             throwable.owner = gameObject;
-            throwable.TurnOffPhysics();
         }
     }
 
@@ -66,13 +65,12 @@ public class Throw : MonoBehaviour
         var rigidBody = throwableComponent.GetComponent<Rigidbody>();
         
         throwableComponent.SetUpThrow();
-        
-        throwable.transform.SetParent(null);
-        throwable.transform.position += transform.forward;
-        
-        rigidBody.AddForce(direction * throwForce, ForceMode.Impulse);
-        
+
+        var oldPosition = throwable.transform.position;
         _equipment.Unequip(false);
+        
+        throwable.transform.position = oldPosition + transform.forward;
+        rigidBody.AddForce(direction * throwForce, ForceMode.Impulse);
         
         OnThrow?.Invoke();
     }
