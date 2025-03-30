@@ -1,15 +1,14 @@
-using System;
 using System.ComponentModel;
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(HorizontalLayoutGroup))]
 public class PlayerHealthGUI : MonoBehaviour
 {
     #region Inspector Properties
 
-    [Description("Text field where to show player health")]
-    [SerializeField]
-    private TextMeshProUGUI healthText;
+    [Description("Character icon to show the player's health")] [SerializeField]
+    private GameObject _playerIconPrefab;
 
     #endregion
 
@@ -26,7 +25,7 @@ public class PlayerHealthGUI : MonoBehaviour
         if (_player != null)
         {
             _player.Health.OnHealthChanged += OnHealthChange;
-            UpdateHealthText(_player.Health);
+            Init(_player);
         }
     }
 
@@ -45,12 +44,27 @@ public class PlayerHealthGUI : MonoBehaviour
 
     void OnHealthChange(Health health, Health.Change change)
     {
-        UpdateHealthText(health);
+        UpdateHealthCount(health);
     }
 
-    void UpdateHealthText(Health health)
+    void UpdateHealthCount(Health health)
     {
-        healthText.text = health.CurrentHealth.ToString();
+        if (health.CurrentHealth > transform.childCount)
+        {
+            var diff = health.CurrentHealth - transform.childCount;
+            for (int i = 0; i < diff; i++)
+            {
+                Instantiate(_playerIconPrefab, transform);
+            }
+        }
+        else
+        {
+            var diff = transform.childCount - health.CurrentHealth;
+            for (int i = 0; i < diff; i++)
+            {
+                Destroy(transform.GetChild(i).gameObject);
+            }
+        }
     }
 
     public void SetPlayer(Player player)
@@ -60,5 +74,10 @@ public class PlayerHealthGUI : MonoBehaviour
         
         _player = player;
         _player.Health.OnHealthChanged += OnHealthChange;
+    }
+
+    private void Init(Player player)
+    {
+        UpdateHealthCount(player.Health);
     }
 }

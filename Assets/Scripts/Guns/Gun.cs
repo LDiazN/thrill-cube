@@ -75,6 +75,7 @@ public class Gun : MonoBehaviour
         _sfxPlayer = GetComponent<SFXPlayer>();
         _equipable = GetComponent<Equipable>();
         _rigidbody = GetComponent<Rigidbody>();
+        _currentAmmo = magSize;
     }
 
     private void OnEnable()
@@ -82,9 +83,9 @@ public class Gun : MonoBehaviour
         OnShoot += PlayShootSound;
     }
 
-    private void Start()
+    private void OnDisable()
     {
-        _currentAmmo = magSize;
+        OnShoot -= PlayShootSound;
     }
 
     private void Update()

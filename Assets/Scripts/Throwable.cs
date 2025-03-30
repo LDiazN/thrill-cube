@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using System.ComponentModel;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -74,8 +74,9 @@ public class Throwable : MonoBehaviour
         if (!health)
             return;
         
-        // TODO set perpetrator as player
         health.TakeDamage(damage, _rigidbody.linearVelocity.normalized, knockback, 3 * knockback, owner);
+        if (health.isDead)
+            PauseFor(0.25f);
     }
 
     private void OnPickRangeTriggerEnter(Collider other)
@@ -96,5 +97,17 @@ public class Throwable : MonoBehaviour
         
         if (equipment.canPickFromFloor == _equipable)
             equipment.canPickFromFloor = null;
+    }
+
+    private void PauseFor(float seconds)
+    {
+        StartCoroutine(PauseTimeCoroutineFor(seconds));
+    }
+
+    private IEnumerator PauseTimeCoroutineFor(float seconds)
+    {
+        Time.timeScale = 0.1f;
+        yield return new WaitForSecondsRealtime(seconds);
+        Time.timeScale = 1;
     }
 }

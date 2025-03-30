@@ -16,7 +16,7 @@ public class GunAnimation : MonoBehaviour
         _gun = GetComponent<Gun>();
     }
 
-    private void Start()
+    private void OnEnable()
     {
         _gun.OnShoot += TriggerShootingAnimation;
     }

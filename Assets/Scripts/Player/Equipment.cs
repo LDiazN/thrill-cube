@@ -57,6 +57,7 @@ public class Equipment : MonoBehaviour
     #region Callbacks
 
     public Action<Equipable> OnEquip;
+    public Action<Equipable> OnUnequip;
     
     #endregion
     
@@ -152,6 +153,8 @@ public class Equipment : MonoBehaviour
         currentlyEquippedObject = null;
         currentGun = null;
         currenThrowable = null;
+        
+        OnUnequip?.Invoke(oldObject);
     }
 
     public void SetupEquipment()
