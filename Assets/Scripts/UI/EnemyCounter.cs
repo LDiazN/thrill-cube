@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 
@@ -26,15 +25,18 @@ public class EnemyCounter : BaseUIComponent
         gameObject.SetActive(false);
     }
 
-    protected override void RegisterEvents(KillAllEnemiesGameManager killAllEnemiesGameManager)
+    protected override void RegisterEvents(GameManager gameManager)
     {
-        base.RegisterEvents(killAllEnemiesGameManager);
-        killAllEnemiesGameManager.OnEnemyCountChanged += SetEnemyCount;
+        base.RegisterEvents(gameManager);
+        var killAll = (KillAllEnemiesGameManager)gameManager;
+        
+        killAll.OnEnemyCountChanged += SetEnemyCount;
     }
 
-    protected override void DeregisterEvents(KillAllEnemiesGameManager killAllEnemiesGameManager)
+    protected override void DeregisterEvents(GameManager killAllEnemiesGameManager)
     {
         base.DeregisterEvents(killAllEnemiesGameManager);
-        killAllEnemiesGameManager.OnEnemyCountChanged -= SetEnemyCount;
+        var killAll = (KillAllEnemiesGameManager)killAllEnemiesGameManager;
+        killAll.OnEnemyCountChanged -= SetEnemyCount;
     }
 }

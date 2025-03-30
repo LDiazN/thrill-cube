@@ -196,6 +196,7 @@ GameObject:
   - component: {fileID: 4327687340829821945}
   - component: {fileID: 5657522142634949134}
   - component: {fileID: 6620381363419820829}
+  - component: {fileID: 2801775372849161089}
   m_Layer: 7
   m_Name: ShooterEnemy
   m_TagString: Untagged
@@ -544,6 +545,19 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 94ccea69732f16044a262ef9104255df, type: 3}
   deathClips:
   - {fileID: 8300000, guid: 2cdfbbf37bd5e164fb23cc5419084945, type: 3}
+--- !u!114 &2801775372849161089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368970634977195101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68c3adda9fc903948aa245586e3769f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  picker: {fileID: 7848474495450890841, guid: 3b0be7a50a264fc46acc8ede80efcce6, type: 3}
 --- !u!1 &2073765829407832901
 GameObject:
   m_ObjectHideFlags: 0

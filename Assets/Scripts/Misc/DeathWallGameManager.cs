@@ -31,11 +31,19 @@ public class DeathWallGameManager : GameManager
 
     protected override void WinGame()
     {
+        if (_gameState != GameState.Playing)
+            return;
         
+        Debug.Log("<color=green>You Win!</color>");
+        _gameState = GameState.Win;
+        CallWin();
     }
 
     protected override void LoseGame()
     {
+        if (_gameState != GameState.Playing)
+            return;
+        
         _player.DeactivateInput();
         _gameState = GameState.Lose;
         CallLose();

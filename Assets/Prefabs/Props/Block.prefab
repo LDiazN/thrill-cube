@@ -110,7 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3640fac8e8374a849a33c7561998442f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 2
+  damage: 3
   knockback: 5
   pickRange: {fileID: 6671443325895204549}
   owner: {fileID: 0}

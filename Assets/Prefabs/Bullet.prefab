@@ -257,7 +257,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2.44, y: 2.08, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7356747775956914463
 MonoBehaviour:
@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4abbf8d6caa9c604887b199e5c2272c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 80
+  maxSpeed: 100
   destroyParticles: {fileID: 6995799823304382606, guid: f5f05794c069faa4a9f5f7ee95b187af, type: 3}
   damage: 1
   wallHitClips:
