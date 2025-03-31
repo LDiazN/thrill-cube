@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/AdrenalineFeeling/DeathWallScene.unity
+    guid: c8ba344107c73b64aafe6dee67d64224
+  - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: 5aa78bdc26d6f7b49b7d38cd843cd7c4
   - enabled: 1

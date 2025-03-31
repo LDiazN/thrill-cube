@@ -52,6 +52,8 @@ public class Equipment : MonoBehaviour
     [HideInInspector]
     [CanBeNull] public Equipable canPickFromFloor;
     
+    public bool HasEquipment => currentlyEquippedObject != null;
+    
     #endregion
     
     #region Callbacks

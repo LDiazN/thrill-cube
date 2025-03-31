@@ -81,6 +81,8 @@ public class PlayerInputController : PlayerController
             _player.Shoot.Fire();
         else if (_player.Equipment.currenThrowable)
             _player.Throw.ThrowEquipment();
+        else if (!_player.Equipment.HasEquipment)
+            TryPick();
     }
 
     void UpdateThrow(InputAction.CallbackContext context)
@@ -92,6 +94,11 @@ public class PlayerInputController : PlayerController
     void UpdatePick(InputAction.CallbackContext context)
     {
        Debug.Log("Trying to pick");
+       TryPick();
+    }
+
+    private void TryPick()
+    {
        if (!_player.Equipment.TryEquipFromPicker())
            _player.Equipment.TryEquipFromFloor();
     }

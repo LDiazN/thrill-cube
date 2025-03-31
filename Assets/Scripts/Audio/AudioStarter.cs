@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using Unity.VisualScripting;
@@ -10,22 +11,28 @@ public class AudioStarter : MonoBehaviour
     [SerializeField] private float timeToFade = 5;
     #endregion
 
-    private void Start()
+    private void Reset()
     {
-        audioSource.volume = 0;
-        StartCoroutine(AudioFade());
+        audioSource = GetComponent<AudioSource>();
     }
 
-    private IEnumerator AudioFade()
+    private void Start()
+    {
+        var originalVolume = audioSource.volume;
+        audioSource.volume = 0;
+        StartCoroutine(AudioFade(originalVolume));
+    }
+
+    private IEnumerator AudioFade(float targetVolume = 1)
     {
         var startingTime = 0f;
 
         while (startingTime < timeToFade)
         {
             startingTime += Time.deltaTime;
-            audioSource.volume = Mathf.Lerp(0, 1, startingTime / timeToFade);
+            audioSource.volume = Mathf.Lerp(0, targetVolume, startingTime / timeToFade);
             yield return new WaitForNextFrameUnit();
         }
-        audioSource.volume = 1;
+        audioSource.volume = targetVolume;
     }
 }
