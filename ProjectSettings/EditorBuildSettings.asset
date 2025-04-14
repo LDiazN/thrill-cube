@@ -11,16 +11,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AdrenalineFeeling/DeathWallScene.unity
     guid: c8ba344107c73b64aafe6dee67d64224
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: 5aa78bdc26d6f7b49b7d38cd843cd7c4
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/TestingKnowledgeSharing.unity
     guid: 7695d9a7d424b904aa198e9527fe9e01
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/TestingShooterEnemy.unity
     guid: 2bbaefa2c2f16a7469d3d35afdb76b69
   m_configObjects:
