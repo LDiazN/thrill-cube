@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using Unity.VisualScripting.ReorderableList;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -34,16 +36,42 @@ public class BSPRoomGen : MonoBehaviour
 
     #endregion
 
+    private Room r1;
+    private Room r2;
     private void Start()
     {
         // DELETE ME LATER
-        GenerateRooms();
+        // GenerateRooms();
+        var _r1 = new RoomRect(Vector3.zero, 10, 6);
+        var _r2 = new RoomRect(new Vector2(10, 0), 8, 5);
+        RenderRoom(r1 = new Room(_r1));
+        RenderRoom(r2 = new Room(_r2));
     }
+
+    private void Update()
+    {
+        var r1Pos = _blocks[0].transform.position;
+        var r2Pos = _blocks[1].transform.position;
+        r1.Area.Position = new Vector2(r1Pos.x, r1Pos.z);
+        r2.Area.Position = new Vector2(r2Pos.x, r2Pos.z);
+        
+        var result = r1.Area.ShareEdge(r2.Area, 0.1f);
+        if (result is not { } edgeShare)
+        {
+            Debug.Log("<color=red> No intersection </color>");
+        }
+        else
+        {
+            Debug.Log($"Start: {edgeShare.Start}, Length: {edgeShare.Length}");
+        }
+    }
+
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(Vector3.zero, new Vector3(worldSize, 1, worldSize));
+        Gizmos.DrawWireCube(Vector3.zero + new Vector3(worldSize / 2f, 0, worldSize / 2f),
+            new Vector3(worldSize, 1, worldSize));
         Gizmos.DrawSphere(Vector3.zero, 1f);
     }
 
@@ -54,7 +82,13 @@ public class BSPRoomGen : MonoBehaviour
         Debug.Log("<color=cyan><b>Starting room Generation</b></color>");
 
         var sampleRect = new RoomRect(Vector3.zero, worldSize, worldSize);
-        var partition = SpacePartition.SplitSpace(sampleRect, minRoomSideSize);
+        
+        // Step 1: Geenrate partitions
+        var partition = SpacePartition.PartitionSpace(sampleRect, minRoomSideSize);
+        // Step 2.1: Set up children so we can find parents easily 
+        partition.SetUpChildren();
+        
+        Debug.Log($"<color=cyan>Generated <b>{partition.Context.Rooms.Count}</b> rooms</color>");
         RenderPartitions(partition);
     }
 
@@ -103,7 +137,7 @@ public class BSPRoomGen : MonoBehaviour
         var rooms = partition.GetRooms();
         foreach (var room in rooms)
         {
-            RenderRoom(new Room(room));
+            RenderRoom(room);
         }
     }
 }
@@ -126,6 +160,68 @@ public struct RoomRect
         Width = width;
         Height = height;
     }
+
+    public EdgeShare? ShareEdge(RoomRect other, float minSharedLength)
+    {
+        var a = this;
+        var b = other;
+        
+        float aLeft = a.Position.x;
+        float aRight = a.Position.x + a.Width;
+        float aBottom = a.Position.y;
+        float aTop = a.Position.y + a.Height;
+
+        float bLeft = b.Position.x;
+        float bRight = b.Position.x + b.Width;
+        float bBottom = b.Position.y;
+        float bTop = b.Position.y + b.Height;
+
+
+        bool rAlign = Mathf.Approximately(aRight, bLeft);
+        bool lAlign = Mathf.Approximately(aLeft, bRight);
+        bool vIntersect = (rAlign || lAlign);
+
+        bool tAlign = Mathf.Approximately(aTop, bBottom);
+        bool bAlign = Mathf.Approximately(aBottom, bTop);
+        bool hIntersect = (tAlign || bAlign);
+
+        // No side intersection
+        if (!vIntersect && !hIntersect)
+            return null;
+
+        EdgeShare result = new();
+        if (vIntersect)
+        {
+            result.Side = rAlign ? Side.Right : Side.Left;
+            result.Start = Mathf.Max(0, bBottom - aBottom);
+            result.Length = Mathf.Min(bTop, aTop) - Mathf.Max(aBottom, bBottom);
+        }
+        else
+        {
+            result.Side = bAlign ? Side.Bottom : Side.Top;
+            result.Start = Mathf.Max(0, bLeft - aLeft);
+            result.Length = Mathf.Min(bRight, aRight) - Mathf.Max(aLeft, bLeft);
+        }
+
+        if (result.Length < minSharedLength)
+            return null;
+
+        return result;
+    }
+
+    public struct EdgeShare
+    {
+        public Side Side;
+        public float Start;
+        public float Length;
+
+        public EdgeShare(Side side, float start, float length)
+        {
+            Side = side;
+            Start = start;
+            Length = length;
+        }
+    }
 }
 
 public enum Side
@@ -133,7 +229,7 @@ public enum Side
     Left,
     Right,
     Bottom,
-    Up
+    Top
 }
 
 public struct Door
@@ -163,14 +259,17 @@ public struct Room
 public class SpacePartition
 {
     public int Id;
-    public RoomRect Area;
+    public int Start; // Time of visit of your first node in this subtree, aka yourself
+    public int End; // Time of visit  of your last node in this subtree, aka your last children
+    public PartitionContext Context;
+    public RoomRect Rect;
     public SpacePartition First;
     public SpacePartition Second;
     public bool IsLeaf => First == null && Second == null;
 
-    public SpacePartition(RoomRect area, SpacePartition first = null, SpacePartition second = null, int id = 0)
+    public SpacePartition(RoomRect rect, SpacePartition first = null, SpacePartition second = null, int id = 0)
     {
-        Area = area;
+        Rect = rect;
         First = first;
         Second = second;
         Id = id;
@@ -180,25 +279,35 @@ public class SpacePartition
         Debug.Assert(bothNull || neitherNull, "You shouldn't have a tree with a single child");
     }
 
-    public static SpacePartition SplitSpace(RoomRect area, float minRoomSideSize, int id = 0)
+    public static SpacePartition PartitionSpace(RoomRect rect, float minRoomSideSize, PartitionContext context = null)
     {
-        var root = new SpacePartition(area);
-        root.Id = id;
-        
-        var result = SplitArea(area, minRoomSideSize);
-        if (result is (var first, var second))
+        context ??= new PartitionContext();
+        var current = new SpacePartition(rect)
         {
-            root.First = SplitSpace(first, minRoomSideSize, id+1);
-            root.Second = SplitSpace(second, minRoomSideSize, root.First.Id + 1);
+            Id = context.PartitionCount,
+            Context = context
+        };
+        context.PartitionCount++;
+
+        var result = SplitRect(rect, minRoomSideSize);
+
+        // If no partition was possible, this is a leaf, return
+        if (result is not var (first, second))
+        {
+            context.Rooms.Add(current);
+            return current;
         }
 
-        return root;
+        current.First = PartitionSpace(first, minRoomSideSize, context);
+        current.Second = PartitionSpace(second, minRoomSideSize, context);
+
+        return current;
     }
 
-    public static (RoomRect, RoomRect)? SplitArea(RoomRect area, float minRoomSideSize)
+    static (RoomRect, RoomRect)? SplitRect(RoomRect rect, float minRoomSideSize)
     {
         // If the room is too small to split, just return null
-        if (area.Width < minRoomSideSize || area.Height < minRoomSideSize)
+        if (rect.Width < minRoomSideSize || rect.Height < minRoomSideSize)
             return null;
 
         // Choose in which direction to cut, vertical or horizontal
@@ -214,36 +323,36 @@ public class SpacePartition
                 // If the side is too small, don't cut
                 // TODO: retry with the other side
                 var minSideSize = 2 * minRoomSideSize;
-                if (area.Width <= minSideSize)
+                if (rect.Width <= minSideSize)
                     return null;
 
                 // These are the new lengths of the new rooms
-                var w1 = Random.Range(minRoomSideSize, area.Width - minRoomSideSize);
-                var w2 = area.Width - w1;
+                var w1 = Random.Range(minRoomSideSize, rect.Width - minRoomSideSize);
+                var w2 = rect.Width - w1;
 
                 // Compute the new position of each room 
-                var p1 = area.Position;
-                var p2 = area.Position + new Vector2(w1, 0);
+                var p1 = rect.Position;
+                var p2 = rect.Position + new Vector2(w1, 0);
 
-                return (new RoomRect(p1, w1, area.Height), new RoomRect(p2, w2, area.Height));
+                return (new RoomRect(p1, w1, rect.Height), new RoomRect(p2, w2, rect.Height));
             }
             else
             {
                 // If the side is too small, don't cut
                 // TODO: retry with the other side
                 var minSideSize = 2 * minRoomSideSize;
-                if (area.Height <= minSideSize)
+                if (rect.Height <= minSideSize)
                     return null;
 
                 // These are the new lengths of the new rooms
-                var h1 = Random.Range(minRoomSideSize, area.Height - minRoomSideSize);
-                var h2 = area.Height - h1;
+                var h1 = Random.Range(minRoomSideSize, rect.Height - minRoomSideSize);
+                var h2 = rect.Height - h1;
 
                 // Compute the new position of each room 
-                var p1 = area.Position;
-                var p2 = area.Position + new Vector2(0, h1);
+                var p1 = rect.Position;
+                var p2 = rect.Position + new Vector2(0, h1);
 
-                return (new RoomRect(p1, area.Width, h1), new RoomRect(p2, area.Width, h2));
+                return (new RoomRect(p1, rect.Width, h1), new RoomRect(p2, rect.Width, h2));
             }
         }
 
@@ -254,23 +363,102 @@ public class SpacePartition
     ///  Get rooms, just leafs 
     /// </summary>
     /// <returns></returns>
-    public List<RoomRect> GetRooms()
+    public List<Room> GetRooms()
     {
-        var result = new List<RoomRect>();
-        GetRoomsRec(result);
+        var rooms = new List<Room>();
+        foreach (var room in Context.Rooms)
+        {
+            rooms.Add(new Room(room.Rect));
+        }
 
+        return rooms;
+    }
+
+    /// <summary>
+    /// Will set up start and finish count of children nodes
+    /// so we can query parents very fast 
+    /// </summary>
+    public void SetUpChildren() => SetUpChildrenRec();
+
+    private int SetUpChildrenRec(int start = 0)
+    {
+        Start = start;
+        start++;
+        if (First != null)
+        {
+            start = First.SetUpChildrenRec(start);
+            Debug.Assert(Second != null, "Should not have just one child");
+            End = Second.SetUpChildrenRec(start) + 1;
+            return End;
+        }
+
+        End = start;
+        return start;
+    }
+
+    public bool IsMyParent(SpacePartition other) => other.Start >= Start && End <= other.End;
+    
+    public bool IsMyChild(SpacePartition other) => Start <= other.Start && other.End <= End;
+
+    public void ConnectPartition()
+    {
+        if (IsLeaf)
+            return;
+        
+        ConnectRooms(First, Second);
+    }
+
+    private static void ConnectRooms(SpacePartition p1, SpacePartition p2)
+    {
+        var childrenP1 = p1.GetChildren();
+        var childrenP2 = p2.GetChildren();
+        foreach (var child in childrenP1)
+        {
+            foreach (var nb in child.GetNeighbors())
+            {
+                if (childrenP2.Contains(nb))
+                {
+                    // Connect child to nb 
+                }
+            }
+        }
+    }
+
+    private List<SpacePartition> GetNeighbors()
+    {
+        throw new NotImplementedException();
+        var result = new List<SpacePartition>();
         return result;
     }
 
-    private void GetRoomsRec(List<RoomRect> rooms)
+    private bool IsNeighbor(SpacePartition other, float intersectionSize)
     {
-        if (IsLeaf)
-        {
-            rooms.Add(Area);
-            return;
-        }
+        Debug.Assert(intersectionSize > 0, "size of intersection should be possitive to make sense");
 
-        First?.GetRoomsRec(rooms);
-        Second?.GetRoomsRec(rooms);
+        throw new NotImplementedException();
+    }
+
+    private List<SpacePartition> GetChildren()
+    {
+        var result = new List<SpacePartition>();
+        foreach (var room in Context.Rooms)
+            if (IsMyChild(room))
+                result.Add(room);
+
+        return result;
+    }
+}
+
+public class PartitionContext
+{
+    // Leaf nodes that correspond to actual rooms
+    public List<SpacePartition> Rooms;
+    public int PartitionCount;
+
+    public PartitionContext(List<SpacePartition> rooms = null, int partitionCount = 0)
+    {
+        rooms ??= new();
+        Rooms = rooms;
+        PartitionCount = partitionCount;
     }
 }
