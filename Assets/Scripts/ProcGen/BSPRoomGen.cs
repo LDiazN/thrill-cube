@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using Unity.VisualScripting.ReorderableList;
 using UnityEngine;
@@ -36,36 +37,11 @@ public class BSPRoomGen : MonoBehaviour
 
     #endregion
 
-    private Room r1;
-    private Room r2;
     private void Start()
     {
         // DELETE ME LATER
-        // GenerateRooms();
-        var _r1 = new RoomRect(Vector3.zero, 10, 6);
-        var _r2 = new RoomRect(new Vector2(10, 0), 8, 5);
-        RenderRoom(r1 = new Room(_r1));
-        RenderRoom(r2 = new Room(_r2));
+        GenerateRooms();
     }
-
-    private void Update()
-    {
-        var r1Pos = _blocks[0].transform.position;
-        var r2Pos = _blocks[1].transform.position;
-        r1.Area.Position = new Vector2(r1Pos.x, r1Pos.z);
-        r2.Area.Position = new Vector2(r2Pos.x, r2Pos.z);
-        
-        var result = r1.Area.ShareEdge(r2.Area, 0.1f);
-        if (result is not { } edgeShare)
-        {
-            Debug.Log("<color=red> No intersection </color>");
-        }
-        else
-        {
-            Debug.Log($"Start: {edgeShare.Start}, Length: {edgeShare.Length}");
-        }
-    }
-
 
     private void OnDrawGizmos()
     {
@@ -82,12 +58,14 @@ public class BSPRoomGen : MonoBehaviour
         Debug.Log("<color=cyan><b>Starting room Generation</b></color>");
 
         var sampleRect = new RoomRect(Vector3.zero, worldSize, worldSize);
-        
+
         // Step 1: Geenrate partitions
         var partition = SpacePartition.PartitionSpace(sampleRect, minRoomSideSize);
         // Step 2.1: Set up children so we can find parents easily 
+        Debug.Log($"<color=cyan>Generating connections...</color>");
         partition.SetUpChildren();
-        
+        partition.ConnectPartition(2 * padding + 2 * wallThickness);
+
         Debug.Log($"<color=cyan>Generated <b>{partition.Context.Rooms.Count}</b> rooms</color>");
         RenderPartitions(partition);
     }
@@ -134,11 +112,73 @@ public class BSPRoomGen : MonoBehaviour
 
     private void RenderPartitions(SpacePartition partition)
     {
+        RenderRooms(partition);
+        RenderHallways(partition);
+    }
+
+    private void RenderRooms(SpacePartition partition)
+    {
         var rooms = partition.GetRooms();
         foreach (var room in rooms)
         {
             RenderRoom(room);
         }
+    }
+
+    private void RenderHallways(SpacePartition partition)
+    {
+        HashSet<(SpacePartition, SpacePartition)> connections = new();
+
+        // Find all the hallways you have to draw
+        foreach (var room in partition.Context.Rooms)
+        foreach (var nb in room.ConnectedRooms)
+            if (!connections.Contains((nb, room)))
+                connections.Add((room, nb));
+
+        // Try to draw the hallways in the specified connection points
+        foreach (var (p1, p2) in connections)
+        {
+            var maybeSharedEdge = p1.Rect.ShareEdge(p2.Rect, 2 * padding + 2 * wallThickness);
+            Debug.Assert(maybeSharedEdge != null, "Should be connected!");
+            var sharedEdge = (RoomRect.EdgeShare)maybeSharedEdge;
+            Vector3 startPoint = Vector3.zero;
+            Vector3 size = Vector3.one;
+
+            switch (sharedEdge.Side)
+            {
+                case Side.Left:
+                    startPoint = new(p1.Rect.Position.x - padding, 0,
+                        p1.Rect.Position.y + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length));
+                    size = new(2 * padding, 0.5f, hallwayWidth);
+                    break;
+                case Side.Right:
+                    startPoint = new(p1.Rect.Position.x + p1.Rect.Width - padding, 0,
+                        p1.Rect.Position.y + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length));
+                    size = new(2 * padding, 0.5f, hallwayWidth);
+                    break;
+                case Side.Bottom:
+                    startPoint = new(p1.Rect.Position.x + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length), 0,
+                        p1.Rect.Position.y - padding);
+                    size = new(hallwayWidth, 0.5f, 2 * padding);
+                    break;
+                case Side.Top:
+                    startPoint = new(p1.Rect.Position.x + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length), 0,
+                        p1.Rect.Position.y + p1.Rect.Height - padding);
+                    size = new(hallwayWidth, 0.5f, 2 * padding);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var hallway = Instantiate(blockPrefab, startPoint, Quaternion.identity);
+            hallway.transform.localScale = size;
+        }
+    }
+
+    private float ChooseHallwayStart(float start, float availableSize)
+    {
+        var offset = padding + wallHeight + hallwayWidth / 2f;
+        return Random.Range(start + offset, start + availableSize - offset);
     }
 }
 
@@ -165,7 +205,7 @@ public struct RoomRect
     {
         var a = this;
         var b = other;
-        
+
         float aLeft = a.Position.x;
         float aRight = a.Position.x + a.Width;
         float aBottom = a.Position.y;
@@ -214,13 +254,6 @@ public struct RoomRect
         public Side Side;
         public float Start;
         public float Length;
-
-        public EdgeShare(Side side, float start, float length)
-        {
-            Side = side;
-            Start = start;
-            Length = length;
-        }
     }
 }
 
@@ -266,6 +299,15 @@ public class SpacePartition
     public SpacePartition First;
     public SpacePartition Second;
     public bool IsLeaf => First == null && Second == null;
+
+    // Only setted when it's a leaf/room
+    public List<SpacePartition> ConnectedRooms = null;
+
+    private void ConnectTo(SpacePartition other)
+    {
+        ConnectedRooms ??= new();
+        ConnectedRooms.Add(other);
+    }
 
     public SpacePartition(RoomRect rect, SpacePartition first = null, SpacePartition second = null, int id = 0)
     {
@@ -397,45 +439,54 @@ public class SpacePartition
     }
 
     public bool IsMyParent(SpacePartition other) => other.Start >= Start && End <= other.End;
-    
+
     public bool IsMyChild(SpacePartition other) => Start <= other.Start && other.End <= End;
 
-    public void ConnectPartition()
+    public void ConnectPartition(float minIntersectionSize)
     {
         if (IsLeaf)
             return;
-        
-        ConnectRooms(First, Second);
+
+        First.ConnectPartition(minIntersectionSize);
+        Second.ConnectPartition(minIntersectionSize);
+        ConnectRooms(First, Second, minIntersectionSize);
     }
 
-    private static void ConnectRooms(SpacePartition p1, SpacePartition p2)
+    private static void ConnectRooms(SpacePartition p1, SpacePartition p2, float minIntersectionSize)
     {
         var childrenP1 = p1.GetChildren();
         var childrenP2 = p2.GetChildren();
         foreach (var child in childrenP1)
         {
-            foreach (var nb in child.GetNeighbors())
+            foreach (var nb in child.GetNeighbors(minIntersectionSize))
             {
                 if (childrenP2.Contains(nb))
                 {
                     // Connect child to nb 
+                    child.ConnectTo(nb);
+                    nb.ConnectTo(child);
                 }
             }
         }
     }
 
-    private List<SpacePartition> GetNeighbors()
+    private List<SpacePartition> GetNeighbors(float minIntersectionSize)
     {
-        throw new NotImplementedException();
         var result = new List<SpacePartition>();
+        foreach (var room in Context.Rooms)
+        {
+            var maybeEdgeShare = Rect.ShareEdge(room.Rect, minIntersectionSize);
+            if (maybeEdgeShare != null)
+                result.Add(room);
+        }
+
         return result;
     }
 
-    private bool IsNeighbor(SpacePartition other, float intersectionSize)
+    private bool IsNeighbor(SpacePartition other, float minIntersectionSize)
     {
-        Debug.Assert(intersectionSize > 0, "size of intersection should be possitive to make sense");
-
-        throw new NotImplementedException();
+        Debug.Assert(minIntersectionSize > 0, "size of intersection should be possitive to make sense");
+        return Rect.ShareEdge(other.Rect, minIntersectionSize) != null;
     }
 
     private List<SpacePartition> GetChildren()
