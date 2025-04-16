@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Collections.Generic;
-using Unity.Mathematics;
-using Unity.VisualScripting;
-using Unity.VisualScripting.ReorderableList;
+using System.Linq;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -59,20 +57,18 @@ public class BSPRoomGen : MonoBehaviour
 
         var sampleRect = new RoomRect(Vector3.zero, worldSize, worldSize);
 
-        // Step 1: Geenrate partitions
+        // Step 1: Generate partitions
         var partition = SpacePartition.PartitionSpace(sampleRect, minRoomSideSize);
+        Debug.Log($"<color=cyan>Generated <b>{partition.Context.RoomPartitions.Count}</b> rooms</color>");
+
         // Step 2.1: Set up children so we can find parents easily 
         Debug.Log($"<color=cyan>Generating connections...</color>");
         partition.SetUpChildren();
+        // Step 2.2: Connect partitions so that every room is reachable
         partition.ConnectPartition(2 * padding + 2 * wallThickness);
 
-        Debug.Log($"<color=cyan>Generated <b>{partition.Context.Rooms.Count}</b> rooms</color>");
+        // Step 3: Render rooms
         RenderPartitions(partition);
-    }
-
-    private List<RoomRect> GeneratePartitions()
-    {
-        return new();
     }
 
     [ContextMenu("Reset Rooms")]
@@ -96,6 +92,9 @@ public class BSPRoomGen : MonoBehaviour
         Debug.Assert(sizesOk,
             "Padding and wall thickness should be less than the overall minimal size of a room");
 
+        var hallwayWidthOk = hallwayWidth < minRoomSideSize - (2 * padding + 2 * wallThickness);
+        Debug.Assert(hallwayWidthOk, "Hallway width is too big for the current room dimensions");
+
         Debug.Log("<color=green><b>Everything OK!</b></color>");
     }
 
@@ -118,11 +117,9 @@ public class BSPRoomGen : MonoBehaviour
 
     private void RenderRooms(SpacePartition partition)
     {
-        var rooms = partition.GetRooms();
+        var rooms = partition.GetRooms(2 * padding + 2 * wallThickness, hallwayWidth);
         foreach (var room in rooms)
-        {
             RenderRoom(room);
-        }
     }
 
     private void RenderHallways(SpacePartition partition)
@@ -130,7 +127,7 @@ public class BSPRoomGen : MonoBehaviour
         HashSet<(SpacePartition, SpacePartition)> connections = new();
 
         // Find all the hallways you have to draw
-        foreach (var room in partition.Context.Rooms)
+        foreach (var room in partition.Context.RoomPartitions)
         foreach (var nb in room.ConnectedRooms)
             if (!connections.Contains((nb, room)))
                 connections.Add((room, nb));
@@ -265,6 +262,14 @@ public enum Side
     Top
 }
 
+public struct Hallway
+{
+    // In world space, bottom left corner, ignores padding and walls
+    public Vector3 Position;
+    public bool IsVertical;
+    public bool IsHorizontal => !IsVertical;
+}
+
 public struct Door
 {
     public Side Side;
@@ -291,7 +296,6 @@ public struct Room
 /// </summary>
 public class SpacePartition
 {
-    public int Id;
     public int Start; // Time of visit of your first node in this subtree, aka yourself
     public int End; // Time of visit  of your last node in this subtree, aka your last children
     public PartitionContext Context;
@@ -299,6 +303,7 @@ public class SpacePartition
     public SpacePartition First;
     public SpacePartition Second;
     public bool IsLeaf => First == null && Second == null;
+    public int RoomIndex = -1;
 
     // Only setted when it's a leaf/room
     public List<SpacePartition> ConnectedRooms = null;
@@ -309,12 +314,11 @@ public class SpacePartition
         ConnectedRooms.Add(other);
     }
 
-    public SpacePartition(RoomRect rect, SpacePartition first = null, SpacePartition second = null, int id = 0)
+    public SpacePartition(RoomRect rect, SpacePartition first = null, SpacePartition second = null)
     {
         Rect = rect;
         First = first;
         Second = second;
-        Id = id;
 
         var bothNull = first == null && second == null;
         var neitherNull = first != null && second != null;
@@ -326,17 +330,16 @@ public class SpacePartition
         context ??= new PartitionContext();
         var current = new SpacePartition(rect)
         {
-            Id = context.PartitionCount,
             Context = context
         };
-        context.PartitionCount++;
 
         var result = SplitRect(rect, minRoomSideSize);
 
         // If no partition was possible, this is a leaf, return
         if (result is not var (first, second))
         {
-            context.Rooms.Add(current);
+            current.RoomIndex = context.RoomPartitions.Count;
+            context.RoomPartitions.Add(current);
             return current;
         }
 
@@ -405,15 +408,102 @@ public class SpacePartition
     ///  Get rooms, just leafs 
     /// </summary>
     /// <returns></returns>
-    public List<Room> GetRooms()
+    public List<Room> GetRooms(float hallwayMargins, float hallwayWidth)
+    {
+        if (Context.Rooms != null)
+            return Context.Rooms;
+
+        // Rooms not yet done, create them
+        BuildRooms(hallwayMargins, hallwayWidth);
+
+        return Context.Rooms;
+    }
+
+    private void BuildRooms(float margin, float hallwayWidth)
     {
         var rooms = new List<Room>();
-        foreach (var room in Context.Rooms)
+        foreach (var room in Context.RoomPartitions)
         {
             rooms.Add(new Room(room.Rect));
         }
+        
+        var roomConnections = GetRoomConnections();
+        var addedPartitions = new HashSet<SpacePartition>();
+        var hallways = new List<Hallway>();
+        
+        foreach (var (p1, p2) in roomConnections)
+        {
+            var maybeSharedEdge = p1.Rect.ShareEdge(p2.Rect, margin);
+            Debug.Assert(maybeSharedEdge != null, "Should be connected!");
+            var sharedEdge = (RoomRect.EdgeShare)maybeSharedEdge;
+            Vector2 startPoint = Vector2.zero;
+            float randomStart = ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length, margin, hallwayWidth);
 
-        return rooms;
+            // Set up a different starting point depending on the side
+            switch (sharedEdge.Side)
+            {
+                case Side.Left:
+                    startPoint = new(p1.Rect.Position.x, p1.Rect.Position.y + randomStart);
+                    break;
+                case Side.Right:
+                    startPoint = new(p1.Rect.Position.x + p1.Rect.Width, p1.Rect.Position.y + randomStart);
+                    break;
+                case Side.Bottom:
+                    startPoint = new(p1.Rect.Position.x + randomStart, p1.Rect.Position.y);
+                    break;
+                case Side.Top:
+                    startPoint = new(p1.Rect.Position.x + randomStart, p1.Rect.Position.y + p1.Rect.Height);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
+            // Add new hallway
+            hallways.Add(new Hallway
+            {
+                IsVertical = sharedEdge.Side is Side.Left or Side.Right,
+                Position = new Vector3(startPoint.x, 0, startPoint.y)
+            });
+            
+            // Add doors for each room 
+            rooms[p1.RoomIndex].Doors.Add(new Door
+            {
+                Length = hallwayWidth, 
+                Side = sharedEdge.Side, 
+                Start = sharedEdge.Start
+            });
+            
+            // We have to compute this again but the other way round 
+            var maybe2SharedEdge = p2.Rect.ShareEdge(p1.Rect, margin);
+            Debug.Assert(maybe2SharedEdge != null, "This should also share and edge!");
+            var p2SharedEdge = (RoomRect.EdgeShare) maybe2SharedEdge;
+            
+            rooms[p2.RoomIndex].Doors.Add(new Door
+            {
+                Length = hallwayWidth, 
+                Side = OppositeSide(sharedEdge.Side),
+                Start = p2SharedEdge.Start
+            });
+        }
+
+        Context.Rooms = rooms;
+    }
+
+    private HashSet<(SpacePartition, SpacePartition)> GetRoomConnections()
+    {
+        HashSet<(SpacePartition, SpacePartition)> connections = new();
+
+        // Find all the hallways you have to draw
+        foreach (var room in Context.RoomPartitions)
+        foreach (var nb in room.ConnectedRooms)
+            if (!connections.Contains((nb, room)))
+                connections.Add((room, nb));
+        return connections;
+    }
+
+    private float ChooseHallwayStart(float start, float availableSize, float topMargin, float hallwayWidth)
+    {
+        return Random.Range(start, start + availableSize - topMargin - hallwayWidth);
     }
 
     /// <summary>
@@ -438,9 +528,7 @@ public class SpacePartition
         return start;
     }
 
-    public bool IsMyParent(SpacePartition other) => other.Start >= Start && End <= other.End;
-
-    public bool IsMyChild(SpacePartition other) => Start <= other.Start && other.End <= End;
+    private bool IsMyChild(SpacePartition other) => Start <= other.Start && other.End <= End;
 
     public void ConnectPartition(float minIntersectionSize)
     {
@@ -456,31 +544,23 @@ public class SpacePartition
     {
         var childrenP1 = p1.GetChildren();
         var childrenP2 = p2.GetChildren();
-        foreach (var child in childrenP1)
+        var connected = false;
+        foreach (var child in childrenP1.TakeWhile(child => !connected))
         {
-            foreach (var nb in child.GetNeighbors(minIntersectionSize))
+            foreach (var nb in child.GetNeighbors(minIntersectionSize).Where(nb => childrenP2.Contains(nb)))
             {
-                if (childrenP2.Contains(nb))
-                {
-                    // Connect child to nb 
-                    child.ConnectTo(nb);
-                    nb.ConnectTo(child);
-                }
+                // Connect child to nb 
+                child.ConnectTo(nb);
+                nb.ConnectTo(child);
+                connected = true;
+                break;
             }
         }
     }
 
     private List<SpacePartition> GetNeighbors(float minIntersectionSize)
     {
-        var result = new List<SpacePartition>();
-        foreach (var room in Context.Rooms)
-        {
-            var maybeEdgeShare = Rect.ShareEdge(room.Rect, minIntersectionSize);
-            if (maybeEdgeShare != null)
-                result.Add(room);
-        }
-
-        return result;
+        return Context.RoomPartitions.Where(room => IsNeighbor(room, minIntersectionSize)).ToList();
     }
 
     private bool IsNeighbor(SpacePartition other, float minIntersectionSize)
@@ -491,25 +571,34 @@ public class SpacePartition
 
     private List<SpacePartition> GetChildren()
     {
-        var result = new List<SpacePartition>();
-        foreach (var room in Context.Rooms)
-            if (IsMyChild(room))
-                result.Add(room);
+        return Context.RoomPartitions.Where(IsMyChild).ToList();
+    }
 
-        return result;
+    public static Side OppositeSide(Side side)
+    {
+        switch (side)
+        {
+            case Side.Left:
+                return Side.Right;
+            case Side.Right:
+                return Side.Left;
+            case Side.Bottom:
+                return Side.Top;
+            case Side.Top:
+                return Side.Bottom;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(side), side, null);
+        }
     }
 }
 
 public class PartitionContext
 {
     // Leaf nodes that correspond to actual rooms
-    public List<SpacePartition> Rooms;
-    public int PartitionCount;
+    public List<SpacePartition> RoomPartitions = new();
 
-    public PartitionContext(List<SpacePartition> rooms = null, int partitionCount = 0)
-    {
-        rooms ??= new();
-        Rooms = rooms;
-        PartitionCount = partitionCount;
-    }
+    public List<Hallway> Hallways = new();
+
+    // Actual rooms, set up after all the generation process is done
+    public List<Room> Rooms;
 }
