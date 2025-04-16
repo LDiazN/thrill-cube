@@ -428,7 +428,6 @@ public class SpacePartition
         }
         
         var roomConnections = GetRoomConnections();
-        var addedPartitions = new HashSet<SpacePartition>();
         var hallways = new List<Hallway>();
         
         foreach (var (p1, p2) in roomConnections)
@@ -486,6 +485,7 @@ public class SpacePartition
             });
         }
 
+        Context.Hallways = hallways;
         Context.Rooms = rooms;
     }
 
