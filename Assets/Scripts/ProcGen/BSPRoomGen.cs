@@ -111,71 +111,44 @@ public class BSPRoomGen : MonoBehaviour
 
     private void RenderPartitions(SpacePartition partition)
     {
-        RenderRooms(partition);
-        RenderHallways(partition);
+        var rooms = partition.GetRooms(2 * padding + 2 * wallThickness, hallwayWidth);
+        RenderRooms(rooms);
+        RenderHallways(partition.Context.Hallways);
     }
 
-    private void RenderRooms(SpacePartition partition)
+    private void RenderRooms(List<Room> rooms)
     {
-        var rooms = partition.GetRooms(2 * padding + 2 * wallThickness, hallwayWidth);
         foreach (var room in rooms)
             RenderRoom(room);
     }
 
-    private void RenderHallways(SpacePartition partition)
+    private void RenderHallways(List<Hallway> hallways)
     {
-        HashSet<(SpacePartition, SpacePartition)> connections = new();
-
-        // Find all the hallways you have to draw
-        foreach (var room in partition.Context.RoomPartitions)
-        foreach (var nb in room.ConnectedRooms)
-            if (!connections.Contains((nb, room)))
-                connections.Add((room, nb));
-
         // Try to draw the hallways in the specified connection points
-        foreach (var (p1, p2) in connections)
+        foreach (var hallway in hallways)
         {
-            var maybeSharedEdge = p1.Rect.ShareEdge(p2.Rect, 2 * padding + 2 * wallThickness);
-            Debug.Assert(maybeSharedEdge != null, "Should be connected!");
-            var sharedEdge = (RoomRect.EdgeShare)maybeSharedEdge;
-            Vector3 startPoint = Vector3.zero;
-            Vector3 size = Vector3.one;
+            var initPosition = hallway.Position;
+            var size = Vector3.one;
+            size.y = 0.5f;
 
-            switch (sharedEdge.Side)
+            if (hallway.IsHorizontal)
             {
-                case Side.Left:
-                    startPoint = new(p1.Rect.Position.x - padding, 0,
-                        p1.Rect.Position.y + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length));
-                    size = new(2 * padding, 0.5f, hallwayWidth);
-                    break;
-                case Side.Right:
-                    startPoint = new(p1.Rect.Position.x + p1.Rect.Width - padding, 0,
-                        p1.Rect.Position.y + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length));
-                    size = new(2 * padding, 0.5f, hallwayWidth);
-                    break;
-                case Side.Bottom:
-                    startPoint = new(p1.Rect.Position.x + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length), 0,
-                        p1.Rect.Position.y - padding);
-                    size = new(hallwayWidth, 0.5f, 2 * padding);
-                    break;
-                case Side.Top:
-                    startPoint = new(p1.Rect.Position.x + ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length), 0,
-                        p1.Rect.Position.y + p1.Rect.Height - padding);
-                    size = new(hallwayWidth, 0.5f, 2 * padding);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                initPosition.x -= padding;
+                initPosition.z += padding;
+                size.x = 2 * padding;
+                size.z = hallwayWidth;
+            }
+            else
+            {
+                initPosition.z -= padding;
+                initPosition.x += padding;
+                size.z = 2 * padding;
+                size.x = hallwayWidth;
             }
 
-            var hallway = Instantiate(blockPrefab, startPoint, Quaternion.identity);
-            hallway.transform.localScale = size;
+            var hallwayBlock = Instantiate(blockPrefab, initPosition, Quaternion.identity);
+            hallwayBlock.transform.localScale = size;
         }
-    }
-
-    private float ChooseHallwayStart(float start, float availableSize)
-    {
-        var offset = padding + wallHeight + hallwayWidth / 2f;
-        return Random.Range(start + offset, start + availableSize - offset);
     }
 }
 
@@ -460,7 +433,7 @@ public class SpacePartition
             // Add new hallway
             hallways.Add(new Hallway
             {
-                IsVertical = sharedEdge.Side is Side.Left or Side.Right,
+                IsVertical = sharedEdge.Side is Side.Bottom or Side.Top,
                 Position = new Vector3(startPoint.x, 0, startPoint.y)
             });
             
