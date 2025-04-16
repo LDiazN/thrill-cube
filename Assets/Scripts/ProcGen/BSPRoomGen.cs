@@ -98,15 +98,88 @@ public class BSPRoomGen : MonoBehaviour
         Debug.Log("<color=green><b>Everything OK!</b></color>");
     }
 
-    private void RenderRoom(Room block)
+    private void RenderRoom(in Room room)
     {
-        var floor = Instantiate(blockPrefab, new Vector3(block.Area.Position.x, 0, block.Area.Position.y),
+        var floor = Instantiate(blockPrefab, new Vector3(room.Area.Position.x, 0, room.Area.Position.y),
             Quaternion.identity);
 
         floor.transform.position += new Vector3(padding, 0, padding);
-        floor.SetSize(new Vector3(block.Area.Width - 2 * padding, 0.5f, block.Area.Height - 2 * padding));
+        floor.SetSize(new Vector3(room.Area.Width - 2 * padding, 0.5f, room.Area.Height - 2 * padding));
 
         _blocks.Add(floor);
+        
+        RenderWalls(room);
+    }
+
+    private void RenderWalls(in Room room)
+    {
+        // Render Left Wall
+        var sides = new []{Side.Left, Side.Right, Side.Bottom, Side.Top};
+        // var sides = new []{Side.Bottom};
+
+        foreach (var side in sides)
+        {
+            var isVertical = side is Side.Left or Side.Right;
+            var blCorner = room.Area.WorldPosition;
+            blCorner.x += padding;
+            blCorner.z += padding;
+            
+            if (side is Side.Right)
+                blCorner.x += room.Area.Width - 2 * padding;
+            if (side is Side.Top)
+                blCorner.z += room.Area.Height - 2 * padding;
+            
+            // Get the length of the side depending on which side it is
+            float sideLength = isVertical ? room.Area.Height : room.Area.Width;
+            
+            var doors = room.Doors.Where(door => door.Side == side).OrderBy(door => door.Start).ToList();
+            if (doors.Count > 0)
+            {
+                float nextStart = 0;
+                var newCorner = blCorner;
+                foreach (var door in doors)
+                {
+                    var end = door.Start;
+                    var length = end - nextStart;
+                    RenderWall(newCorner, length, isVertical);
+                    nextStart = end + hallwayWidth;
+                    
+                    // move corner past the door
+                    if (isVertical)
+                        newCorner.z += length + hallwayWidth;
+                    else 
+                        newCorner.x += length + hallwayWidth;
+                }
+            
+                // Render the last wall to finish this side
+                
+                RenderWall(newCorner, (sideLength - 2 * padding) - nextStart, isVertical);
+            }
+            else
+            {
+                RenderWall(blCorner, sideLength - 2 * padding, isVertical);
+            }
+        }
+    }
+
+    private void RenderWall(Vector3 blCorner, float length, bool isVertical)
+    {
+        var size = Vector3.one;
+        if (isVertical)
+        {
+            size.z = length;
+            size.x = wallThickness;
+        }
+        else
+        {
+            size.x = length;
+            size.z = wallThickness;
+        }
+        size.y = wallHeight;
+
+        var block = Instantiate(blockPrefab, blCorner, Quaternion.identity);
+        block.transform.localScale = size;
+        _blocks.Add(block);
     }
 
     private void RenderPartitions(SpacePartition partition)
@@ -148,6 +221,7 @@ public class BSPRoomGen : MonoBehaviour
 
             var hallwayBlock = Instantiate(blockPrefab, initPosition, Quaternion.identity);
             hallwayBlock.transform.localScale = size;
+            _blocks.Add(hallwayBlock);
         }
     }
 }
@@ -410,21 +484,26 @@ public class SpacePartition
             var sharedEdge = (RoomRect.EdgeShare)maybeSharedEdge;
             Vector2 startPoint = Vector2.zero;
             float randomStart = ChooseHallwayStart(sharedEdge.Start, sharedEdge.Length, margin, hallwayWidth);
+            float rs2;
 
             // Set up a different starting point depending on the side
             switch (sharedEdge.Side)
             {
                 case Side.Left:
                     startPoint = new(p1.Rect.Position.x, p1.Rect.Position.y + randomStart);
+                    rs2 = p1.Rect.Position.y + randomStart - p2.Rect.Position.y;
                     break;
                 case Side.Right:
                     startPoint = new(p1.Rect.Position.x + p1.Rect.Width, p1.Rect.Position.y + randomStart);
+                    rs2 = p1.Rect.Position.y + randomStart - p2.Rect.Position.y;
                     break;
                 case Side.Bottom:
                     startPoint = new(p1.Rect.Position.x + randomStart, p1.Rect.Position.y);
+                    rs2 = p1.Rect.Position.x + randomStart - p2.Rect.Position.x;
                     break;
                 case Side.Top:
                     startPoint = new(p1.Rect.Position.x + randomStart, p1.Rect.Position.y + p1.Rect.Height);
+                    rs2 = p1.Rect.Position.x + randomStart - p2.Rect.Position.x;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -442,19 +521,18 @@ public class SpacePartition
             {
                 Length = hallwayWidth, 
                 Side = sharedEdge.Side, 
-                Start = sharedEdge.Start
+                Start = randomStart 
             });
             
             // We have to compute this again but the other way round 
             var maybe2SharedEdge = p2.Rect.ShareEdge(p1.Rect, margin);
             Debug.Assert(maybe2SharedEdge != null, "This should also share and edge!");
-            var p2SharedEdge = (RoomRect.EdgeShare) maybe2SharedEdge;
             
             rooms[p2.RoomIndex].Doors.Add(new Door
             {
                 Length = hallwayWidth, 
                 Side = OppositeSide(sharedEdge.Side),
-                Start = p2SharedEdge.Start
+                Start = rs2
             });
         }
 
