@@ -133,32 +133,24 @@ public class BSPRoomGen : MonoBehaviour
             float sideLength = isVertical ? room.Area.Height : room.Area.Width;
             
             var doors = room.Doors.Where(door => door.Side == side).OrderBy(door => door.Start).ToList();
-            if (doors.Count > 0)
+            float nextStart = 0;
+            var newCorner = blCorner;
+            foreach (var door in doors)
             {
-                float nextStart = 0;
-                var newCorner = blCorner;
-                foreach (var door in doors)
-                {
-                    var end = door.Start;
-                    var length = end - nextStart;
-                    RenderWall(newCorner, length, isVertical);
-                    nextStart = end + hallwayWidth;
+                var end = door.Start;
+                var length = end - nextStart;
+                RenderWall(newCorner, length, isVertical);
+                nextStart = end + hallwayWidth;
                     
-                    // move corner past the door
-                    if (isVertical)
-                        newCorner.z += length + hallwayWidth;
-                    else 
-                        newCorner.x += length + hallwayWidth;
-                }
+                // move corner past the door
+                if (isVertical)
+                    newCorner.z += length + hallwayWidth;
+                else 
+                    newCorner.x += length + hallwayWidth;
+            }
             
-                // Render the last wall to finish this side
-                
-                RenderWall(newCorner, (sideLength - 2 * padding) - nextStart, isVertical);
-            }
-            else
-            {
-                RenderWall(blCorner, sideLength - 2 * padding, isVertical);
-            }
+            // Render the last wall to finish this side
+            RenderWall(newCorner, (sideLength - 2 * padding) - nextStart, isVertical);
         }
     }
 
