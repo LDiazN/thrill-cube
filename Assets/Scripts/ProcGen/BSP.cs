@@ -90,6 +90,19 @@ public struct RoomRect
 
         return  maxX <= otherMaxX && maxY <= otherMaxY;
     }
+    
+    public static bool Intersects(RoomRect a, RoomRect b)
+    {
+        return !(a.Position.x + a.Width <= b.Position.x ||   // a is left of b
+                 a.Position.x >= b.Position.x + b.Width ||   // a is right of b
+                 a.Position.y + a.Height <= b.Position.y ||  // a is above b
+                 a.Position.y >= b.Position.y + b.Height);   // a is below b
+    }
+
+    public bool Intersects(in RoomRect other)
+    {
+        return Intersects(this, other);
+    }
 }
 
 public enum Side

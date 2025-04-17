@@ -1,32 +1,36 @@
-using System;
+using System.ComponentModel;
+using Mono.Cecil;
 using UnityEngine;
 
 
-[RequireComponent(typeof(BoxCollider))]
 public class PCGProp : MonoBehaviour
 {
-    #region Components
+    #region Inspector Properties
 
-    private BoxCollider _collider;
-    private BoxCollider collider => GetCollider();
-
+    [SerializeField] private float height;
+    [SerializeField] private float width;
+    [Description("Is Y in world coordinates, used for placing the object in the world")]
+    
     #endregion
 
-    private void Awake()
+    private void OnDrawGizmos()
     {
-        _collider = GetComponent<BoxCollider>();
+        Gizmos.color = Color.magenta;
+        var rect = GetRect();
+
+        var dimensions = new Vector3(rect.Width, 1, rect.Height);
+        var position = rect.WorldPosition;
+        Gizmos.DrawWireCube(rect.WorldPosition + new Vector3(rect.Width/2, -1, rect.Height/2), dimensions);
+        Debug.Log($"Rect: {rect}");
     }
 
     public RoomRect GetRect()
     {
-        var min = collider.bounds.min;
+        Vector2 position = new (transform.position.x, transform.position.z);
+        position.x -= width / 2;
+        position.y -= height / 2;
         
-        Vector2 position = Vector2.zero;
-        if (gameObject.scene.IsValid())
-            position = new Vector2(min.x, min.z);
-        
-        var size = collider.size;
-        return new RoomRect(position, size.x, size.z);
+        return new RoomRect(position, width, height);
     }
 
     /// <summary>
@@ -36,16 +40,9 @@ public class PCGProp : MonoBehaviour
     /// <param name="position">Position to place this prop at</param>
     public void BLPlaceAt(Vector3 position)
     {
-        var translation = position - collider.bounds.min;
-        var finalPos = transform.position + translation;
+        Vector3 translation = new(width / 2, 0, height / 2);
+        var finalPos = position + translation;
+        finalPos.y += 1;
         transform.position = finalPos;
-    }
-
-    private BoxCollider GetCollider()
-    {
-        if (_collider == null)
-            _collider = GetComponent<BoxCollider>();
-
-        return _collider;
     }
 }

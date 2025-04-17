@@ -43,6 +43,12 @@ public class RoomGen : MonoBehaviour
 
     [Description("Objects that can be picked and make damage")]
     [SerializeField] private List<PCGProp> pickableObjects;
+
+    [Description("Sometimes placing a prop in the room can have conflicts with other already placed props. " +
+                 "This is the amount of times to retry if it fails to place a prop")]
+    [SerializeField]
+    [Min(1)]
+    private int placementRetries = 10;
     
     [Header("Settings")] [SerializeField] private RoomBlock blockPrefab;
 
@@ -122,9 +128,23 @@ public class RoomGen : MonoBehaviour
             // Choose a prop randomly
             var propIdx = Random.Range(0, roomProps.Count());
             var prop = roomProps[propIdx];
+            var rect = prop.GetRect();
+
+            // Try to find a position for this prop
+            bool placementFound = false;
+            Vector2 position = Vector2.zero;
+            for (var retry = 0; retry < placementRetries && !placementFound; retry++)
+            {
+                position = ChooseRandomPositionInsideOf(usableArea, rect);
+                rect.Position = position;
+                
+                // Check if the placement has conflicts with other props
+                placementFound = CanPlace(rect, placedProps);
+            }
             
-            // Choose a position
-            var position = ChooseRandomPositionInsideOf(usableArea, prop.GetRect());
+            // We failed to place this prop, skip it
+            if (!placementFound)
+                continue;
 
             // Instantiate object and place it in the specified position
             var propObj = Instantiate(prop, Vector3.zero, Quaternion.identity);
@@ -135,6 +155,14 @@ public class RoomGen : MonoBehaviour
             var propRect = propObj.GetRect();
             placedProps.Add(propRect);
         }
+    }
+
+    private static bool CanPlace(in RoomRect rect, List<RoomRect> placedProps)
+    {
+        foreach(var propRect in placedProps)
+            if (propRect.Intersects(rect))
+                return false;
+        return true;
     }
 
     private static Vector2 ChooseRandomPositionInsideOf(in RoomRect container, in RoomRect other)
