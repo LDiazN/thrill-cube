@@ -2,11 +2,14 @@ using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework.Constraints;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class BSPRoomGen : MonoBehaviour
+/// <summary>
+/// Generates rooms using the BSP algorithm
+/// </summary>
+public class RoomGen : MonoBehaviour
 {
     #region Inspector Properties
 
@@ -25,6 +28,22 @@ public class BSPRoomGen : MonoBehaviour
     [Header("World Spec")] [SerializeField]
     private float worldSize = 100;
 
+    [Header("Props and enemies")] 
+    [Description("Static props, like desk, chairs, computers")]
+    [SerializeField]
+    private List<PCGProp> props;
+
+    [SerializeField]
+    private PCGProp shooterEnemy;
+    
+    [SerializeField]
+    private PCGProp meleeEnemy;
+
+    [SerializeField] private List<PCGProp> guns;
+
+    [Description("Objects that can be picked and make damage")]
+    [SerializeField] private List<PCGProp> pickableObjects;
+    
     [Header("Settings")] [SerializeField] private RoomBlock blockPrefab;
 
     #endregion
@@ -32,14 +51,9 @@ public class BSPRoomGen : MonoBehaviour
     #region Internal State
 
     private List<RoomBlock> _blocks = new();
+    private List<GameObject> _props = new();
 
     #endregion
-
-    private void Start()
-    {
-        // DELETE ME LATER
-        GenerateRooms();
-    }
 
     private void OnDrawGizmos()
     {
@@ -67,8 +81,73 @@ public class BSPRoomGen : MonoBehaviour
         // Step 2.2: Connect partitions so that every room is reachable
         partition.ConnectPartition(2 * padding + 2 * wallThickness);
 
-        // Step 3: Render rooms
+        // Step 3: Render rooms, generate floors, walls, and hallways
+        Debug.Log($"<color=cyan>Rendering world...</color>");
         RenderPartitions(partition);
+
+        // Step 4: Populate rooms with props and enemies
+        Debug.Log($"<color=cyan>Populating rooms...</color>");
+        PopulateRooms(partition.GetRooms());
+        
+        Debug.Log($"<color=green>Room generation successfully finished!</color>");
+    }
+
+    private void PopulateRooms(List<Room> rooms)
+    {
+        foreach (var room in rooms)
+            PopulateRoom(room);
+    }
+
+    private void PopulateRoom(in Room room)
+    {
+        var usableArea = room.UsableArea(padding, wallThickness);
+        var propRects = new List<RoomRect>();
+        
+        // 1. Place static props according to room size
+        PlaceStaticProps(usableArea, propRects);
+    }
+
+    private void PlaceStaticProps(RoomRect usableArea, List<RoomRect> placedProps)
+    {
+        var roomProps = props.Where(prop => prop.GetRect().CanFitIn(usableArea)).ToList();
+        
+        // If no prop fits in this room, just return
+        if (!roomProps.Any())
+            return;
+        
+        // TODO Choose this number dynamically depending on room size
+        const int nProps = 3;
+        for (var i = 0; i < nProps; i++)
+        {
+            // Choose a prop randomly
+            var propIdx = Random.Range(0, roomProps.Count());
+            var prop = roomProps[propIdx];
+            
+            // Choose a position
+            var position = ChooseRandomPositionInsideOf(usableArea, prop.GetRect());
+
+            // Instantiate object and place it in the specified position
+            var propObj = Instantiate(prop, Vector3.zero, Quaternion.identity);
+            propObj.BLPlaceAt(new Vector3(position.x, 0, position.y));
+            _props.Add(propObj.gameObject);
+            
+            // Add the new prop to the list 
+            var propRect = propObj.GetRect();
+            placedProps.Add(propRect);
+        }
+    }
+
+    private static Vector2 ChooseRandomPositionInsideOf(in RoomRect container, in RoomRect other)
+    {
+        var contMinX = container.Position.x;
+        var contMaxX = contMinX + container.Width;
+        var contMinY = container.Position.y;
+        var contMaxY = contMinY + container.Height;
+        
+        return new Vector2(
+            Random.Range(contMinX, contMaxX - other.Width),
+            Random.Range(contMinY, contMaxY - other.Height)
+            );
     }
 
     [ContextMenu("Reset Rooms")]
@@ -76,11 +155,14 @@ public class BSPRoomGen : MonoBehaviour
     {
         Debug.Log("<color=red><b>Resetting current rooms</b></color>");
         foreach (var block in _blocks)
-        {
             Destroy(block.gameObject);
-        }
 
         _blocks.Clear();
+
+        foreach (var obj in _props)
+            Destroy(obj);
+        
+        _props.Clear();
     }
 
     /// <summary>Check the parameters to see if they make sense</summary> 
@@ -107,15 +189,14 @@ public class BSPRoomGen : MonoBehaviour
         floor.SetSize(new Vector3(room.Area.Width - 2 * padding, 0.5f, room.Area.Height - 2 * padding));
 
         _blocks.Add(floor);
-        
+
         RenderWalls(room);
     }
 
     private void RenderWalls(in Room room)
     {
         // Render Left Wall
-        var sides = new []{Side.Left, Side.Right, Side.Bottom, Side.Top};
-        // var sides = new []{Side.Bottom};
+        var sides = new[] { Side.Left, Side.Right, Side.Bottom, Side.Top };
 
         foreach (var side in sides)
         {
@@ -123,15 +204,15 @@ public class BSPRoomGen : MonoBehaviour
             var blCorner = room.Area.WorldPosition;
             blCorner.x += padding;
             blCorner.z += padding;
-            
+
             if (side is Side.Right)
                 blCorner.x += room.Area.Width - 2 * padding;
             if (side is Side.Top)
                 blCorner.z += room.Area.Height - 2 * padding;
-            
+
             // Get the length of the side depending on which side it is
             float sideLength = isVertical ? room.Area.Height : room.Area.Width;
-            
+
             var doors = room.Doors.Where(door => door.Side == side).OrderBy(door => door.Start).ToList();
             float nextStart = 0;
             var newCorner = blCorner;
@@ -140,15 +221,15 @@ public class BSPRoomGen : MonoBehaviour
                 var end = door.Start;
                 var length = end - nextStart;
                 RenderWall(newCorner, length, isVertical);
-                nextStart = end + hallwayWidth;
-                    
+                nextStart = end + door.Length;
+
                 // move corner past the door
                 if (isVertical)
-                    newCorner.z += length + hallwayWidth;
-                else 
-                    newCorner.x += length + hallwayWidth;
+                    newCorner.z += length + door.Length;
+                else
+                    newCorner.x += length + door.Length;
             }
-            
+
             // Render the last wall to finish this side
             RenderWall(newCorner, (sideLength - 2 * padding) - nextStart, isVertical);
         }
@@ -167,6 +248,7 @@ public class BSPRoomGen : MonoBehaviour
             size.x = length;
             size.z = wallThickness;
         }
+
         size.y = wallHeight;
 
         var block = Instantiate(blockPrefab, blCorner, Quaternion.identity);
@@ -214,121 +296,38 @@ public class BSPRoomGen : MonoBehaviour
             var hallwayBlock = Instantiate(blockPrefab, initPosition, Quaternion.identity);
             hallwayBlock.transform.localScale = size;
             _blocks.Add(hallwayBlock);
+            RenderHallwayWalls(hallway);
         }
     }
-}
 
-/// <summary>
-/// A specifying a room's dimensions.
-/// We only generate rooms in 2D, so we only consider width and height coordinates
-/// </summary>
-public struct RoomRect
-{
-    public Vector2 Position;
-    public float Width;
-    public float Height;
-
-    public Vector3 WorldPosition => new Vector3(Position.x, 0, Position.y);
-
-    public RoomRect(Vector2 position, float width, float height)
+    private void RenderHallwayWalls(in Hallway hallway)
     {
-        Position = position;
-        Width = width;
-        Height = height;
-    }
-
-    public EdgeShare? ShareEdge(RoomRect other, float minSharedLength)
-    {
-        var a = this;
-        var b = other;
-
-        float aLeft = a.Position.x;
-        float aRight = a.Position.x + a.Width;
-        float aBottom = a.Position.y;
-        float aTop = a.Position.y + a.Height;
-
-        float bLeft = b.Position.x;
-        float bRight = b.Position.x + b.Width;
-        float bBottom = b.Position.y;
-        float bTop = b.Position.y + b.Height;
-
-
-        bool rAlign = Mathf.Approximately(aRight, bLeft);
-        bool lAlign = Mathf.Approximately(aLeft, bRight);
-        bool vIntersect = (rAlign || lAlign);
-
-        bool tAlign = Mathf.Approximately(aTop, bBottom);
-        bool bAlign = Mathf.Approximately(aBottom, bTop);
-        bool hIntersect = (tAlign || bAlign);
-
-        // No side intersection
-        if (!vIntersect && !hIntersect)
-            return null;
-
-        EdgeShare result = new();
-        if (vIntersect)
+        // Hallways have two walls, one to each side of its corresponding direction
+        var startPosition = hallway.Position;
+        if (hallway.IsHorizontal)
         {
-            result.Side = rAlign ? Side.Right : Side.Left;
-            result.Start = Mathf.Max(0, bBottom - aBottom);
-            result.Length = Mathf.Min(bTop, aTop) - Mathf.Max(aBottom, bBottom);
+            startPosition.x -= padding;
+            startPosition.z += padding;
         }
         else
         {
-            result.Side = bAlign ? Side.Bottom : Side.Top;
-            result.Start = Mathf.Max(0, bLeft - aLeft);
-            result.Length = Mathf.Min(bRight, aRight) - Mathf.Max(aLeft, bLeft);
+            startPosition.z -= padding;
+            startPosition.x += padding;
         }
 
-        if (result.Length < minSharedLength)
-            return null;
+        // startPosition.x += padding;
+        // startPosition.z += padding;
+        RenderWall(startPosition, 2 * padding + wallThickness, hallway.IsVertical);
 
-        return result;
-    }
+        if (hallway.IsVertical)
+            startPosition.x += hallwayWidth;
+        else
+            startPosition.z += hallwayWidth;
 
-    public struct EdgeShare
-    {
-        public Side Side;
-        public float Start;
-        public float Length;
-    }
-}
-
-public enum Side
-{
-    Left,
-    Right,
-    Bottom,
-    Top
-}
-
-public struct Hallway
-{
-    // In world space, bottom left corner, ignores padding and walls
-    public Vector3 Position;
-    public bool IsVertical;
-    public bool IsHorizontal => !IsVertical;
-}
-
-public struct Door
-{
-    public Side Side;
-    public float Start;
-    public float Length;
-}
-
-public struct Room
-{
-    public RoomRect Area;
-    public List<Door> Doors;
-
-    public Room(RoomRect area, List<Door> doors = null)
-    {
-        doors ??= new List<Door>();
-
-        Area = area;
-        Doors = doors;
+        RenderWall(startPosition, 2 * padding + wallThickness, hallway.IsVertical);
     }
 }
+
 
 /// <summary>
 ///  A binary tree used for the BSP algorithm
@@ -458,6 +457,8 @@ public class SpacePartition
         return Context.Rooms;
     }
 
+    public List<Room> GetRooms() => Context.Rooms;
+
     private void BuildRooms(float margin, float hallwayWidth)
     {
         var rooms = new List<Room>();
@@ -465,10 +466,10 @@ public class SpacePartition
         {
             rooms.Add(new Room(room.Rect));
         }
-        
+
         var roomConnections = GetRoomConnections();
         var hallways = new List<Hallway>();
-        
+
         foreach (var (p1, p2) in roomConnections)
         {
             var maybeSharedEdge = p1.Rect.ShareEdge(p2.Rect, margin);
@@ -500,29 +501,29 @@ public class SpacePartition
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
             // Add new hallway
             hallways.Add(new Hallway
             {
                 IsVertical = sharedEdge.Side is Side.Bottom or Side.Top,
                 Position = new Vector3(startPoint.x, 0, startPoint.y)
             });
-            
+
             // Add doors for each room 
             rooms[p1.RoomIndex].Doors.Add(new Door
             {
-                Length = hallwayWidth, 
-                Side = sharedEdge.Side, 
-                Start = randomStart 
+                Length = hallwayWidth,
+                Side = sharedEdge.Side,
+                Start = randomStart
             });
-            
+
             // We have to compute this again but the other way round 
             var maybe2SharedEdge = p2.Rect.ShareEdge(p1.Rect, margin);
             Debug.Assert(maybe2SharedEdge != null, "This should also share and edge!");
-            
+
             rooms[p2.RoomIndex].Doors.Add(new Door
             {
-                Length = hallwayWidth, 
+                Length = hallwayWidth,
                 Side = OppositeSide(sharedEdge.Side),
                 Start = rs2
             });
