@@ -21,7 +21,6 @@ public class PCGProp : MonoBehaviour
         var dimensions = new Vector3(rect.Width, 1, rect.Height);
         var position = rect.WorldPosition;
         Gizmos.DrawWireCube(rect.WorldPosition + new Vector3(rect.Width/2, -1, rect.Height/2), dimensions);
-        Debug.Log($"Rect: {rect}");
     }
 
     public RoomRect GetRect()

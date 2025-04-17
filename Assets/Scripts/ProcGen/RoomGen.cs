@@ -49,6 +49,9 @@ public class RoomGen : MonoBehaviour
     [SerializeField]
     [Min(1)]
     private int placementRetries = 10;
+
+    [Header("Enemies and weapons")] [SerializeField]
+    private List<RoomSizeConfiguration> roomConfigurations;
     
     [Header("Settings")] [SerializeField] private RoomBlock blockPrefab;
 
@@ -58,6 +61,7 @@ public class RoomGen : MonoBehaviour
 
     private List<RoomBlock> _blocks = new();
     private List<GameObject> _props = new();
+    private List<RoomData> _roomDatas = new();
 
     #endregion
 
@@ -84,6 +88,7 @@ public class RoomGen : MonoBehaviour
         // Step 2.1: Set up children so we can find parents easily 
         Debug.Log($"<color=cyan>Generating connections...</color>");
         partition.SetUpChildren();
+        
         // Step 2.2: Connect partitions so that every room is reachable
         partition.ConnectPartition(2 * padding + 2 * wallThickness);
 
@@ -93,28 +98,84 @@ public class RoomGen : MonoBehaviour
 
         // Step 4: Populate rooms with props and enemies
         Debug.Log($"<color=cyan>Populating rooms...</color>");
-        PopulateRooms(partition.GetRooms());
+        InitRoomData(partition);
+        PopulateRooms(partition);
         
         Debug.Log($"<color=green>Room generation successfully finished!</color>");
     }
 
-    private void PopulateRooms(List<Room> rooms)
+    private void InitRoomData(SpacePartition partition)
     {
-        foreach (var room in rooms)
-            PopulateRoom(room);
+        foreach(var _ in partition.GetRooms()) 
+            _roomDatas.Add(new RoomData()); 
     }
 
-    private void PopulateRoom(in Room room)
+    private void PopulateRooms(SpacePartition partition)
+    {
+        int i = 0;
+        foreach (var room in partition.GetRooms())
+            PopulateRoom(room, i++);
+    }
+
+    private void PopulateRoom(in Room room, int roomIndex)
     {
         var usableArea = room.UsableArea(padding, wallThickness);
-        var propRects = new List<RoomRect>();
+        var placedProps = new List<RoomRect>();
         
-        // 1. Place static props according to room size
-        PlaceStaticProps(usableArea, propRects);
+        // 1. Place enemies 
+        PlaceEnemies(usableArea, room, roomIndex, placedProps);
+        
+        // 2. Place static props according to room size
+        PlaceStaticProps(usableArea, room, placedProps);
     }
 
-    private void PlaceStaticProps(RoomRect usableArea, List<RoomRect> placedProps)
+    private void PlaceEnemies(RoomRect usableArea, in Room room, int roomIndex, List<RoomRect> placedProps)
     {
+        // Can only place shooter enemy if the room is big enough
+        var config = ChooseConfiguration(room);
+        var nShooters = Random.Range(0, config.maxShooters);
+        var nMelees = Random.Range(0, config.maxMelees);
+
+        // Place shooters
+        var actualShooters = Random.Range(config.minShooters, config.maxShooters);
+        for (var i = 0; i < nShooters; i++)
+            if (TryPlaceObject(shooterEnemy, usableArea, placedProps))
+                actualShooters++;
+
+        // Place Melees
+        var meleeShooters = Random.Range(config.minMelees, config.maxMelees);
+        for (var i = 0; i < nMelees; i++)
+            if (TryPlaceObject(meleeEnemy, usableArea, placedProps))
+                meleeShooters++;
+
+        // Update room data
+        var data  = _roomDatas[roomIndex];
+        data.nShooter = actualShooters;
+        data.nMelee = meleeShooters;
+        _roomDatas[roomIndex] = data;
+    }
+
+    private RoomSizeConfiguration ChooseConfiguration(in Room room)
+    {
+        // return the highest configuration you can get
+        float area = room.Area.Area;
+
+        int i = 0;
+        roomConfigurations.Sort((a,b) => a.minArea.CompareTo(b.minArea));
+        for (int index = 0; index < roomConfigurations.Count(); index++)
+        {
+            if (roomConfigurations[index].minArea < area)
+                i = index;
+            else
+                break;
+        }
+
+        return roomConfigurations[i];
+    }
+
+    private void PlaceStaticProps(RoomRect usableArea, Room room, List<RoomRect> placedProps)
+    {
+        var config = ChooseConfiguration(room);
         var roomProps = props.Where(prop => prop.GetRect().CanFitIn(usableArea)).ToList();
         
         // If no prop fits in this room, just return
@@ -122,39 +183,46 @@ public class RoomGen : MonoBehaviour
             return;
         
         // TODO Choose this number dynamically depending on room size
-        const int nProps = 3;
+        var nProps = config.minStaticProps;
         for (var i = 0; i < nProps; i++)
         {
             // Choose a prop randomly
             var propIdx = Random.Range(0, roomProps.Count());
             var prop = roomProps[propIdx];
-            var rect = prop.GetRect();
-
-            // Try to find a position for this prop
-            bool placementFound = false;
-            Vector2 position = Vector2.zero;
-            for (var retry = 0; retry < placementRetries && !placementFound; retry++)
-            {
-                position = ChooseRandomPositionInsideOf(usableArea, rect);
-                rect.Position = position;
-                
-                // Check if the placement has conflicts with other props
-                placementFound = CanPlace(rect, placedProps);
-            }
-            
-            // We failed to place this prop, skip it
-            if (!placementFound)
-                continue;
-
-            // Instantiate object and place it in the specified position
-            var propObj = Instantiate(prop, Vector3.zero, Quaternion.identity);
-            propObj.BLPlaceAt(new Vector3(position.x, 0, position.y));
-            _props.Add(propObj.gameObject);
-            
-            // Add the new prop to the list 
-            var propRect = propObj.GetRect();
-            placedProps.Add(propRect);
+            TryPlaceObject(prop, usableArea, placedProps);
         }
+    }
+
+    private bool TryPlaceObject(PCGProp obj, in RoomRect usableArea, in List<RoomRect> placedProps)
+    {
+        var rect = obj.GetRect();
+
+        // Try to find a position for this prop
+        bool placementFound = false;
+        Vector2 position = Vector2.zero;
+        for (var retry = 0; retry < placementRetries && !placementFound; retry++)
+        {
+            position = ChooseRandomPositionInsideOf(usableArea, rect);
+            rect.Position = position;
+                
+            // Check if the placement has conflicts with other props
+            placementFound = CanPlace(rect, placedProps);
+        }
+            
+        // We failed to place this prop, skip it
+        if (!placementFound)
+            return false;
+
+        // Instantiate object and place it in the specified position
+        var propObj = Instantiate(obj, Vector3.zero, Quaternion.identity);
+        propObj.BLPlaceAt(new Vector3(position.x, 0, position.y));
+        _props.Add(propObj.gameObject);
+            
+        // Add the new prop to the list 
+        var propRect = propObj.GetRect();
+        placedProps.Add(propRect);
+
+        return true;
     }
 
     private static bool CanPlace(in RoomRect rect, List<RoomRect> placedProps)
@@ -204,6 +272,8 @@ public class RoomGen : MonoBehaviour
 
         var hallwayWidthOk = hallwayWidth < minRoomSideSize - (2 * padding + 2 * wallThickness);
         Debug.Assert(hallwayWidthOk, "Hallway width is too big for the current room dimensions");
+        
+        Debug.Assert(roomConfigurations.Any(), "Without room configurations we can populate rooms with enemies and guns");
 
         Debug.Log("<color=green><b>Everything OK!</b></color>");
     }
@@ -673,4 +743,27 @@ public class PartitionContext
 
     // Actual rooms, set up after all the generation process is done
     public List<Room> Rooms;
+}
+
+public struct RoomData
+{
+    public int nMelee;
+    public int nShooter;
+    public bool isPlayerStart;
+    public int nPistols;
+    public int nPickables;
+}
+
+[Description("Room generation parameters according to the size")]
+[Serializable]
+public struct RoomSizeConfiguration
+{
+    public int minShooters;
+    public int maxShooters;
+    public int minMelees;
+    public int maxMelees;
+    public float minArea;
+    public int minGuns;
+    public int minPickables;
+    public int minStaticProps;
 }

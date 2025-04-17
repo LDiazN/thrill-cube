@@ -103,6 +103,8 @@ public struct RoomRect
     {
         return Intersects(this, other);
     }
+
+    public readonly float Area => Height * Width;
 }
 
 public enum Side
@@ -150,5 +152,4 @@ public struct Room
             Area.Height - 2 * margin
             );
     }
-
 }
