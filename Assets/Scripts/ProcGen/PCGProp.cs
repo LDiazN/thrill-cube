@@ -7,7 +7,9 @@ public class PCGProp : MonoBehaviour
 {
     #region Inspector Properties
 
+    [Min(0.1f)]
     [SerializeField] private float height;
+    [Min(0.1f)]
     [SerializeField] private float width;
     [Description("Is Y in world coordinates, used for placing the object in the world")]
     

@@ -2,8 +2,11 @@ using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 /// <summary>
@@ -52,8 +55,15 @@ public class RoomGen : MonoBehaviour
 
     [Header("Enemies and weapons")] [SerializeField]
     private List<RoomSizeConfiguration> roomConfigurations;
+
+    [Header("Player Settings")] 
+    [Description("Prop used to spawn the player on scene start")]
+    [SerializeField]
+    private PCGProp playerStartObject;
     
-    [Header("Settings")] [SerializeField] private RoomBlock blockPrefab;
+    [Header("Settings")] 
+    [SerializeField] private RoomBlock floorPrefab;
+    [SerializeField] private RoomBlock wallPrefab;
 
     #endregion
 
@@ -62,8 +72,14 @@ public class RoomGen : MonoBehaviour
     private List<RoomBlock> _blocks = new();
     private List<GameObject> _props = new();
     private List<RoomData> _roomDatas = new();
+    [CanBeNull] private NavMeshSurface _navMesh;
 
     #endregion
+
+    private void Awake()
+    {
+        _navMesh = FindFirstObjectByType<NavMeshSurface>();
+    }
 
     private void OnDrawGizmos()
     {
@@ -99,7 +115,9 @@ public class RoomGen : MonoBehaviour
         // Step 4: Populate rooms with props and enemies
         Debug.Log($"<color=cyan>Populating rooms...</color>");
         InitRoomData(partition);
+        ChoosePlayerStart(partition);
         PopulateRooms(partition);
+        ActivateNavmesh();
         
         Debug.Log($"<color=green>Room generation successfully finished!</color>");
     }
@@ -110,49 +128,105 @@ public class RoomGen : MonoBehaviour
             _roomDatas.Add(new RoomData()); 
     }
 
-    private void PopulateRooms(SpacePartition partition)
+    private void ChoosePlayerStart(SpacePartition partition)
     {
-        int i = 0;
-        foreach (var room in partition.GetRooms())
-            PopulateRoom(room, i++);
+        // Choose the smallest room for player start
+        var index = 0;
+        var rooms = partition.GetRooms();
+        foreach (var room in rooms)
+            if (room.Area.Area < rooms[index].Area.Area)
+                index = room.Id;
+                    
+        var data = _roomDatas[index];
+        data.isPlayerStart = true;
+        _roomDatas[index] = data;
     }
 
-    private void PopulateRoom(in Room room, int roomIndex)
+    private void PopulateRooms(SpacePartition partition)
+    {
+        foreach (var room in partition.GetRooms())
+            PopulateRoom(room);
+    }
+
+    private void PopulateRoom(in Room room)
     {
         var usableArea = room.UsableArea(padding, wallThickness);
         var placedProps = new List<RoomRect>();
         
+        // 0. Place player start
+        PlacePlayerStart(room, placedProps);
+        
         // 1. Place enemies 
-        PlaceEnemies(usableArea, room, roomIndex, placedProps);
+        PlaceEnemies(usableArea, room, placedProps);
         
         // 2. Place static props according to room size
         PlaceStaticProps(usableArea, room, placedProps);
+        
+        // 3. Place weapons and pickables. Generation depends on amount of enemies
+        PlaceWeapons(room, placedProps);
     }
 
-    private void PlaceEnemies(RoomRect usableArea, in Room room, int roomIndex, List<RoomRect> placedProps)
+    private void PlacePlayerStart(in Room room, List<RoomRect> placedProps)
     {
+        // If not player start, just return
+        if (!_roomDatas[room.Id].isPlayerStart)
+            return;
+        
+        // Keep trying until you can fit the player start
+        while (!TryPlaceObject(playerStartObject, room.UsableArea(padding, wallThickness), placedProps)) ;
+    }
+
+    private void PlaceWeapons(in Room room, List<RoomRect> placedProps)
+    {
+        var config = ChooseConfiguration(room);
+        var data = _roomDatas[room.Id];
+        var nGuns = Mathf.Max(config.minGuns, data.nMelee);
+        var nProps = config.minPickables;
+
+        for (int i = 0; i < nGuns; i++)
+        {
+            // Choose the gun at random
+            var gun = guns[Random.Range(0, guns.Count)];
+            TryPlaceObject(gun, room.UsableArea(padding, wallThickness), placedProps, false);
+        }
+
+        for (int i = 0; i < nProps; i++)
+        {
+            // Choose the gun at random
+            var pick = pickableObjects[Random.Range(0, pickableObjects.Count)];
+            TryPlaceObject(pick, room.UsableArea(padding, wallThickness), placedProps, false);
+        }
+
+    }
+
+    private void PlaceEnemies(RoomRect usableArea, in Room room, List<RoomRect> placedProps)
+    {
+        // Don't generate enemies in the player's starting room
+        var data  = _roomDatas[room.Id];
+        if (data.isPlayerStart)
+            return;
+        
         // Can only place shooter enemy if the room is big enough
         var config = ChooseConfiguration(room);
-        var nShooters = Random.Range(0, config.maxShooters);
-        var nMelees = Random.Range(0, config.maxMelees);
+        var nShooters = Random.Range(config.minShooters, config.maxShooters + 1);
+        var nMelees = Random.Range(config.minMelees, config.maxMelees + 1);
 
         // Place shooters
-        var actualShooters = Random.Range(config.minShooters, config.maxShooters);
+        var actualShooters = 0;
         for (var i = 0; i < nShooters; i++)
-            if (TryPlaceObject(shooterEnemy, usableArea, placedProps))
+            if (TryPlaceObject(shooterEnemy, usableArea, placedProps, false))
                 actualShooters++;
 
         // Place Melees
-        var meleeShooters = Random.Range(config.minMelees, config.maxMelees);
+        var actualMelees = 0;
         for (var i = 0; i < nMelees; i++)
             if (TryPlaceObject(meleeEnemy, usableArea, placedProps))
-                meleeShooters++;
+                actualMelees++;
 
         // Update room data
-        var data  = _roomDatas[roomIndex];
         data.nShooter = actualShooters;
-        data.nMelee = meleeShooters;
-        _roomDatas[roomIndex] = data;
+        data.nMelee = actualMelees;
+        _roomDatas[room.Id] = data;
     }
 
     private RoomSizeConfiguration ChooseConfiguration(in Room room)
@@ -193,7 +267,7 @@ public class RoomGen : MonoBehaviour
         }
     }
 
-    private bool TryPlaceObject(PCGProp obj, in RoomRect usableArea, in List<RoomRect> placedProps)
+    private bool TryPlaceObject(PCGProp obj, in RoomRect usableArea, in List<RoomRect> placedProps, bool canTakeSpace = true)
     {
         var rect = obj.GetRect();
 
@@ -206,7 +280,9 @@ public class RoomGen : MonoBehaviour
             rect.Position = position;
                 
             // Check if the placement has conflicts with other props
-            placementFound = CanPlace(rect, placedProps);
+            // If can't take space, then we don't have to check if we can place it. 
+            // Think about pickables or guns
+            placementFound = !canTakeSpace || CanPlace(rect, placedProps);
         }
             
         // We failed to place this prop, skip it
@@ -259,6 +335,7 @@ public class RoomGen : MonoBehaviour
             Destroy(obj);
         
         _props.Clear();
+        _roomDatas.Clear();
     }
 
     /// <summary>Check the parameters to see if they make sense</summary> 
@@ -280,7 +357,7 @@ public class RoomGen : MonoBehaviour
 
     private void RenderRoom(in Room room)
     {
-        var floor = Instantiate(blockPrefab, new Vector3(room.Area.Position.x, 0, room.Area.Position.y),
+        var floor = Instantiate(floorPrefab, new Vector3(room.Area.Position.x, 0, room.Area.Position.y),
             Quaternion.identity);
 
         floor.transform.position += new Vector3(padding, 0, padding);
@@ -349,7 +426,7 @@ public class RoomGen : MonoBehaviour
 
         size.y = wallHeight;
 
-        var block = Instantiate(blockPrefab, blCorner, Quaternion.identity);
+        var block = Instantiate(wallPrefab, blCorner, Quaternion.identity);
         block.transform.localScale = size;
         _blocks.Add(block);
     }
@@ -359,6 +436,29 @@ public class RoomGen : MonoBehaviour
         var rooms = partition.GetRooms(2 * padding + 2 * wallThickness, hallwayWidth);
         RenderRooms(rooms);
         RenderHallways(partition.Context.Hallways);
+        
+        // Now generate the nav mesh for the AI if available
+        GenerateNavMesh();
+    }
+
+    private void GenerateNavMesh()
+    {
+        if (!_navMesh)
+            return;
+        
+        // I don't know why but if the nav mesh is active 
+        // when you spawn the enemies, they all spawn in the same point
+        _navMesh.gameObject.SetActive(true);
+        _navMesh.BuildNavMesh();
+        _navMesh.gameObject.SetActive(false);
+    }
+
+    private void ActivateNavmesh()
+    {
+        if (!_navMesh)
+            return;
+
+        _navMesh.gameObject.SetActive(true);
     }
 
     private void RenderRooms(List<Room> rooms)
@@ -391,7 +491,7 @@ public class RoomGen : MonoBehaviour
                 size.x = hallwayWidth;
             }
 
-            var hallwayBlock = Instantiate(blockPrefab, initPosition, Quaternion.identity);
+            var hallwayBlock = Instantiate(floorPrefab, initPosition, Quaternion.identity);
             hallwayBlock.transform.localScale = size;
             _blocks.Add(hallwayBlock);
             RenderHallwayWalls(hallway);
@@ -561,9 +661,7 @@ public class SpacePartition
     {
         var rooms = new List<Room>();
         foreach (var room in Context.RoomPartitions)
-        {
-            rooms.Add(new Room(room.Rect));
-        }
+            rooms.Add(new Room(room.Rect, room.RoomIndex));
 
         var roomConnections = GetRoomConnections();
         var hallways = new List<Hallway>();

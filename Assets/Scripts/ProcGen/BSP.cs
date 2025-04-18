@@ -132,15 +132,17 @@ public struct Door
 
 public struct Room
 {
+    public int Id;
     public RoomRect Area;
     public List<Door> Doors;
 
-    public Room(RoomRect area, List<Door> doors = null)
+    public Room(RoomRect area, int id, List<Door> doors = null)
     {
         doors ??= new List<Door>();
 
         Area = area;
         Doors = doors;
+        Id = id;
     }
 
     public readonly RoomRect UsableArea(float padding, float wallThickness)
