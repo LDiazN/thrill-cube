@@ -64,6 +64,10 @@ public class RoomGen : MonoBehaviour
     [Header("Settings")] 
     [SerializeField] private RoomBlock floorPrefab;
     [SerializeField] private RoomBlock wallPrefab;
+    public bool generateStatics = true;
+    public bool generateEnemies = true;
+    public bool generatePickables = true;
+    public bool generateNavmesh = true;
 
     #endregion
 
@@ -157,13 +161,16 @@ public class RoomGen : MonoBehaviour
         PlacePlayerStart(room, placedProps);
         
         // 1. Place enemies 
-        PlaceEnemies(usableArea, room, placedProps);
+        if (generateEnemies)
+            PlaceEnemies(usableArea, room, placedProps);
         
         // 2. Place static props according to room size
-        PlaceStaticProps(usableArea, room, placedProps);
+        if (generateStatics)
+            PlaceStaticProps(usableArea, room, placedProps);
         
         // 3. Place weapons and pickables. Generation depends on amount of enemies
-        PlaceWeapons(room, placedProps);
+        if (generatePickables)
+            PlaceWeapons(room, placedProps);
     }
 
     private void PlacePlayerStart(in Room room, List<RoomRect> placedProps)
@@ -327,12 +334,18 @@ public class RoomGen : MonoBehaviour
     {
         Debug.Log("<color=red><b>Resetting current rooms</b></color>");
         foreach (var block in _blocks)
+        {
+            block.gameObject.SetActive(false);
             Destroy(block.gameObject);
+        }
 
         _blocks.Clear();
 
         foreach (var obj in _props)
+        {
+            obj.SetActive(false);
             Destroy(obj);
+        }
         
         _props.Clear();
         _roomDatas.Clear();
@@ -357,11 +370,11 @@ public class RoomGen : MonoBehaviour
 
     private void RenderRoom(in Room room)
     {
-        var floor = Instantiate(floorPrefab, new Vector3(room.Area.Position.x, 0, room.Area.Position.y),
+        var floor = Instantiate(floorPrefab, new Vector3(room.Area.Position.x + 0.1f, 0, room.Area.Position.y + 0.1f),
             Quaternion.identity);
 
         floor.transform.position += new Vector3(padding, 0, padding);
-        floor.SetSize(new Vector3(room.Area.Width - 2 * padding, 0.5f, room.Area.Height - 2 * padding));
+        floor.SetSize(new Vector3(room.Area.Width - 2 * padding - 0.2f, 0.5f, room.Area.Height - 2 * padding - 0.2f));
 
         _blocks.Add(floor);
 
@@ -443,7 +456,7 @@ public class RoomGen : MonoBehaviour
 
     private void GenerateNavMesh()
     {
-        if (!_navMesh)
+        if (!_navMesh || !generateNavmesh)
             return;
         
         // I don't know why but if the nav mesh is active 
