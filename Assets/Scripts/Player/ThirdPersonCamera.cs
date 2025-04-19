@@ -40,11 +40,6 @@ public class ThirdPersonCamera : MonoBehaviour
         set => _cameraMovement = value;
     }
 
-    /// <summary>
-    /// Original position that the camera had from the player
-    /// </summary>
-    private Vector3 _originalOffset;
-
     private PlayerMovement _playerMovement;
 
     private float _tiltSmoothVelocity = 0;
@@ -54,11 +49,6 @@ public class ThirdPersonCamera : MonoBehaviour
     private void Awake()
     {
         _playerMovement = GetComponent<PlayerMovement>();
-    }
-
-    private void Start()
-    {
-        _originalOffset = playerCamera.transform.localPosition;
     }
 
     // Called by player movement component in fixed update

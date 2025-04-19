@@ -12807,101 +12807,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1853581304}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1853884211
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1853884213}
-  - component: {fileID: 1853884212}
-  m_Layer: 0
-  m_Name: RoomGenerator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1853884212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1853884211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3ca9d027ce225f408fab3199e0a4c45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  minRoomSideSize: 20
-  padding: 1
-  wallThickness: 0.5
-  wallHeight: 6
-  hallwayWidth: 4
-  worldSize: 100
-  props:
-  - {fileID: 5613613802814188572, guid: afa22e20be07c1c4fa6c1f312ae41dd4, type: 3}
-  - {fileID: 5613613802814188572, guid: c3bd11c50e6a34d4c9762c017fabfedf, type: 3}
-  - {fileID: 6993511202117571198, guid: fd11764d294a4234faf9c757923207b8, type: 3}
-  - {fileID: 3987972164454272533, guid: d442c287e82f2e14b9d1b17e53093a1e, type: 3}
-  - {fileID: 5613613802814188572, guid: 427d897bdc363bd4c91f58bdd516a1ec, type: 3}
-  shooterEnemy: {fileID: 763693641452114154, guid: 2297c03f2a3213d48bc7b5fcc3ae92f0, type: 3}
-  meleeEnemy: {fileID: 2922089317905224850, guid: 63258bfd1a5d4ce46adaf2434e19d566, type: 3}
-  guns:
-  - {fileID: 1320629943010743307, guid: 991650822366e4f46ac00bdb505d6f77, type: 3}
-  pickableObjects:
-  - {fileID: 83159339071852899, guid: 52712d829803c3043ba59020178ac832, type: 3}
-  placementRetries: 10
-  roomConfigurations:
-  - minShooters: 0
-    maxShooters: 3
-    minMelees: 0
-    maxMelees: 0
-    minArea: 0
-    minGuns: 1
-    minPickables: 1
-    minStaticProps: 2
-  - minShooters: 2
-    maxShooters: 4
-    minMelees: 0
-    maxMelees: 2
-    minArea: 324
-    minGuns: 1
-    minPickables: 2
-    minStaticProps: 4
-  - minShooters: 4
-    maxShooters: 6
-    minMelees: 2
-    maxMelees: 3
-    minArea: 1800
-    minGuns: 2
-    minPickables: 2
-    minStaticProps: 10
-  playerStartObject: {fileID: 9086317563161474925, guid: 35fe1ea991aea08498f126dd22a8f2df, type: 3}
-  floorPrefab: {fileID: 480690368931502078, guid: c927a647f2a3c9844a8a02d71bd77a34, type: 3}
-  wallPrefab: {fileID: 5107307818361764214, guid: 1ea69089f71b4364ba1d8504945a3386, type: 3}
-  generateStatics: 1
-  generateEnemies: 1
-  generatePickables: 1
-  generateNavmesh: 0
---- !u!4 &1853884213
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1853884211}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.18729068, y: 66.15089, z: -44.71797}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1861113745
 GameObject:
   m_ObjectHideFlags: 0
@@ -15526,13 +15431,70 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
   m_IsOn: 1
+--- !u!1001 &8370512510777789764
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2081607026469515047, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_Name
+      value: RoomGenerator
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.18729068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 66.15089
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -44.71797
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7702397834803638192, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: de84518ce36ceaa4fa3f938f0737275e, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1196815384}
   - {fileID: 1567701943}
-  - {fileID: 1853884213}
+  - {fileID: 8370512510777789764}
   - {fileID: 694011294}
   - {fileID: 1234642770}
   - {fileID: 1217684097}

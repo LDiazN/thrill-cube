@@ -64,6 +64,7 @@ public class RoomGen : MonoBehaviour
     [Header("Settings")] 
     [SerializeField] private RoomBlock floorPrefab;
     [SerializeField] private RoomBlock wallPrefab;
+    [SerializeField] private KnowledgeArea knowledgeAreaPrefab;
     public bool generateStatics = true;
     public bool generateEnemies = true;
     public bool generatePickables = true;
@@ -78,6 +79,11 @@ public class RoomGen : MonoBehaviour
     private List<RoomData> _roomDatas = new();
     [CanBeNull] private NavMeshSurface _navMesh;
 
+    #endregion
+    
+    #region Events 
+    public event Action OnGenerationFinished;
+    
     #endregion
 
     private void Awake()
@@ -124,6 +130,7 @@ public class RoomGen : MonoBehaviour
         ActivateNavmesh();
         
         Debug.Log($"<color=green>Room generation successfully finished!</color>");
+        OnGenerationFinished?.Invoke();
     }
 
     private void InitRoomData(SpacePartition partition)
@@ -230,6 +237,16 @@ public class RoomGen : MonoBehaviour
             if (TryPlaceObject(meleeEnemy, usableArea, placedProps))
                 actualMelees++;
 
+        // Place knowledge area
+        if (knowledgeAreaPrefab)
+        {
+            var area = Instantiate(knowledgeAreaPrefab, room.Area.Center3D(), Quaternion.identity);
+            var collider = area.gameObject.GetComponent<BoxCollider>();
+            var size = new Vector3(room.Area.Width, 10, room.Area.Height);
+            collider.center = Vector3.zero;
+            collider.size = size;
+        }
+        
         // Update room data
         data.nShooter = actualShooters;
         data.nMelee = actualMelees;

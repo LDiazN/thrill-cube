@@ -21,12 +21,7 @@ public class PlayerHealthGUI : MonoBehaviour
 
     private void Start()
     {
-        // Init Health Value
-        if (_player != null)
-        {
-            _player.Health.OnHealthChanged += OnHealthChange;
-            Init(_player);
-        }
+        SetPlayer(_player);
     }
 
     private void OnEnable()
@@ -73,7 +68,12 @@ public class PlayerHealthGUI : MonoBehaviour
             _player.Health.OnHealthChanged -= OnHealthChange;
         
         _player = player;
+
+        if (!_player)
+            return;
+        
         _player.Health.OnHealthChanged += OnHealthChange;
+        Init(_player);
     }
 
     private void Init(Player player)

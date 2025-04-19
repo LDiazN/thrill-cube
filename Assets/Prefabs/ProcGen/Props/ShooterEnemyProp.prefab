@@ -103,6 +103,10 @@ PrefabInstance:
       propertyPath: drawGizmos
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4273459547474500613, guid: 4146862cca8b5cf40a8d9693a6ff3b78, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a4e30981df27b9b488f744639a231cd0, type: 2}
     - target: {fileID: 7404962673105438467, guid: 4146862cca8b5cf40a8d9693a6ff3b78, type: 3}
       propertyPath: drawGizmos
       value: 0

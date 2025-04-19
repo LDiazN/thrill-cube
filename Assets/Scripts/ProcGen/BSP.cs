@@ -74,6 +74,21 @@ public struct RoomRect
         public float Start;
         public float Length;
     }
+
+    public readonly Vector2 Center()
+    {
+        var center = Position;
+        center.x += Width / 2;
+        center.y += Height / 2;
+
+        return center;
+    }
+
+    public readonly Vector3 Center3D()
+    {
+        var center2d = Center();
+        return new Vector3(center2d.x, 0, center2d.y);
+    }
     
     public override string ToString()
     {

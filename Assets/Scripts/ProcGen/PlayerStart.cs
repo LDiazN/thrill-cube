@@ -10,29 +10,30 @@ public class PlayerStart : MonoBehaviour
     #region Inspector Properties
 
     [SerializeField]
-    private GameObject playerPrefab;
+    private Player player;
 
     #endregion
     
-    #region Internal State
+    #region Events
 
-    private Camera mainCamera;
-
+    public event Action OnPlayerSpawned;
+    
     #endregion
-
 
     private void Awake()
     {
-        mainCamera = Camera.main;
+        player = FindFirstObjectByType<Player>(FindObjectsInactive.Include);
     }
 
-    private void Start()
+    public void SpawnPlayer()
     {
-        if (mainCamera)
-            Destroy(mainCamera.gameObject);
-
-        Instantiate(playerPrefab, transform.position, transform.rotation);
+        if (!player)
+            return;
+        
+        player.transform.position = transform.position;
+        player.transform.rotation = transform.rotation;
+        player.gameObject.SetActive(true);
+        OnPlayerSpawned?.Invoke();
+        gameObject.SetActive(false);
     }
-    
-    
 }

@@ -103,6 +103,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3854753210033835871, guid: ec17fda85c64888458ce3f51bd4bbb5c, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a4e30981df27b9b488f744639a231cd0, type: 2}
     - target: {fileID: 5802897395679835323, guid: ec17fda85c64888458ce3f51bd4bbb5c, type: 3}
       propertyPath: m_Name
       value: MeleeEnemy
