@@ -48,3 +48,6 @@ MonoBehaviour:
   knowledgeShareScene: TestingKnowledgeSharing
   shootingEnemyScene: TestingShooterEnemy
   mainMenuScene: MainMenu
+  bspDemoScene: BSPDemo
+  bspGameScene: BSPGame
+  deathWallScene: DeathWallScene

@@ -35,7 +35,7 @@ public class RangeDetector : MonoBehaviour
     {
         if (player == null)
         {
-            player = FindFirstObjectByType<Player>();
+            player = FindFirstObjectByType<Player>(FindObjectsInactive.Include);
         }
     }
 

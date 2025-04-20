@@ -10,6 +10,9 @@ public class SceneChanger : MonoBehaviour
     [SerializeField] string knowledgeShareScene;
     [SerializeField] string shootingEnemyScene;
     [SerializeField] string mainMenuScene;
+    [SerializeField] string bspDemoScene;
+    [SerializeField] string bspGameScene;
+    [SerializeField] string deathWallScene; // Actually points to the lobby for that scene
     #endregion 
     
     #region Internal State
@@ -54,5 +57,20 @@ public class SceneChanger : MonoBehaviour
     public void GoShootingEnemyScene()
     {
         GoScene(shootingEnemyScene);
+    }
+
+    public void GoToBSPDemo()
+    {
+        GoScene(bspDemoScene);
+    }
+
+    public void GoToBSPGame()
+    {
+        GoScene(bspGameScene);
+    }
+
+    public void GoToDeathWall()
+    {
+        GoScene(deathWallScene);
     }
 }

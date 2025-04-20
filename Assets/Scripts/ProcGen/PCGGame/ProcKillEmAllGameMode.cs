@@ -94,12 +94,23 @@ public class ProcKillEmAllGameMode : GameManager
 
     protected override void LoseGame()
     {
+        if (_gameState != GameState.Playing)
+            return;
+        
         Debug.Log("<color=red>You Lose</color>");
+        _player.DeactivateInput();
+        _gameState = GameState.Lose;
+        CallLose();
     }
 
     protected override void WinGame()
     {
-        Debug.Log("<color=green>You Win</color>");
+        if (_gameState != GameState.Playing)
+            return;
+        
+        Debug.Log("<color=green>You Win!</color>");
+        _gameState = GameState.Win;
+        CallWin();
     }
 
     private void OnEnemyDied()

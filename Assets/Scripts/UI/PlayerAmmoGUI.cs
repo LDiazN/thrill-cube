@@ -109,7 +109,7 @@ public class PlayerAmmoGUI : MonoBehaviour
 
     void ClearCallbacks()
     {
-        if (!player)
+        if (!player || !player.Equipment)
             return;
         
         player.Equipment.OnEquip -= OnEquipmentChanged;
