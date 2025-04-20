@@ -19,7 +19,7 @@ public class KillAllEnemiesGameManager : GameManager
         RegisterEnemies(FindEnemies());
         // This needs to be on start so that PlayerHealth is set by then.
         // Player health is set in player's awake
-        if (!_player)
+        if (_player)
             _player.Health.OnHealthChanged += PlayerHealthChanged;
         
         // Set up input for restart
