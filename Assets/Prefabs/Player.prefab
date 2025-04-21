@@ -410,11 +410,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 316184727601047487}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a0b05526268bc40b178cda8ed9707f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiGuidePrefab: {fileID: 4080725986069529123, guid: fa82ad560c862a349ae91588a0314c3e, type: 3}
+  _maxGuideDistance: 3
 --- !u!1 &1392923092237794166
 GameObject:
   m_ObjectHideFlags: 0
