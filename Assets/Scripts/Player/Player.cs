@@ -126,5 +126,20 @@ public class Player : MonoBehaviour
         
         OnPlayerControllerChanged?.Invoke(UsingAI);
     }
+
+    public void TryAttack()
+    {
+        if (Equipment.currentGun)
+            Shoot.Fire();
+        else if (Equipment.currenThrowable)
+            Throw.ThrowEquipment();
+        else if (!Equipment.HasEquipment)
+            TryPick();
+    }
     
+    public void TryPick()
+    {
+       if (!Equipment.TryEquipFromPicker())
+           Equipment.TryEquipFromFloor();
+    }
 }

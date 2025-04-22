@@ -34,6 +34,9 @@ public class AIInputController : MonoBehaviour
     private bool _callbacksRegistered = false;
     [CanBeNull] private AIGuide _aiGuide;
 
+    private float _rotationSpeedX = 0;
+    private float _rotationSpeedY = 0;
+
     #endregion
     private void Awake()
     {
@@ -61,8 +64,18 @@ public class AIInputController : MonoBehaviour
     private void Update()
     {
         // TrySyncGuide();
-        UpdatePlayerMovement();
         UpdateCameraMovement();
+        UpdatePlayerMovement();
+        UpdateShoot();
+    }
+
+    private void UpdateShoot()
+    {
+        var aiGuide = GetAIGuide();
+        if (!aiGuide.ShouldShoot)
+            return;
+        
+        _player.TryAttack();
     }
 
     private void OnDrawGizmos()
@@ -71,29 +84,78 @@ public class AIInputController : MonoBehaviour
             return; 
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(transform.position, transform.position + _player.PlayerMovement.MovementDirection);
+
+        if (!_aiGuide)
+            return;
+        var closestEnemy = _aiGuide.GetClosestEnemy();
+        if (!closestEnemy)
+            return;
+        
+        Gizmos.color = Color.yellow;
+        var cameraPos = _player.TPSCamera.GetCameraPosition();
+        
+        Gizmos.DrawLine(cameraPos, closestEnemy.transform.position);
     }
 
     void UpdateCameraMovement()
     {
-        // _player.TPSCamera.CameraMovement = lookOffset;
         var guide = GetAIGuide();
         var enemy = guide.GetClosestEnemy();
         Vector3 targetPosition;
         LayerMask ignoreMask = 1 << LayerMask.NameToLayer("Player");
-        if (enemy && guide.RangeDetector.HasLineOfSight(enemy, ignoreMask))
-            targetPosition = enemy.transform.position;
+        
+        // Choose the direction to point to depending on whether we have line of sight to the enemy
+        // or not
+        if (enemy && guide.ShootingDistance.HasLineOfSight(enemy, ignoreMask))
+            targetPosition = enemy.transform.position + Vector3.up;
         else
-            targetPosition = guide.transform.position;
+            targetPosition = guide.transform.position + 10 * guide.transform.forward;
 
-        var desired = targetPosition - _player.TPSCamera.GetCameraPosition();
-        var current = _player.TPSCamera.GetCameraDirection();
-        var change = Quaternion.FromToRotation(current, desired).eulerAngles;
-        var xRotation = change.x;
-        var yRotation = change.y;
+        // Where we want the character looking at 
+        var desiredDir = targetPosition - _player.TPSCamera.GetCameraPosition();
+        var currentDir = _player.TPSCamera.GetCameraDirection();
+        
+        // Compute the rotation required to get to the desired direction
+        var change = GetXYRotToAlign(currentDir, desiredDir);
 
-        _player.TPSCamera.CameraMovement = new( xRotation,  yRotation);
+        var current = (Vector2) transform.rotation.eulerAngles;
+        var desired = current + change;
+        
+        // Damping helps to prevent flickering 
+        var xRotation = Mathf.SmoothDampAngle(current.x, desired.x, ref _rotationSpeedX, 0.1f);
+        var yRotation = Mathf.SmoothDampAngle(current.y, desired.y, ref _rotationSpeedY, 0.1f);
+        
+        // The input is intended for mouse so it's based on offsets
+        var xOffset = xRotation - current.x;
+        var yOffset = yRotation - current.y;
 
+        xOffset *= 10;
+        yOffset *= 10;
+        
+        // This is inverted bc in a mouse horizontal movement rotates around the Y axis, while vertical movement
+        // rotates the X axis 
+        _player.TPSCamera.CameraMovement = new(change.y,change.x);
     }
+    
+    private static Vector2 GetXYRotToAlign(Vector3 currentDir, Vector3 targetDir)
+    {
+        currentDir.Normalize();
+        targetDir.Normalize();
+
+        // Compute current yaw and pitch
+        float currentYaw   = Mathf.Atan2(currentDir.x, currentDir.z) * Mathf.Rad2Deg;
+        float currentPitch = Mathf.Asin(currentDir.y) * Mathf.Rad2Deg;
+
+        // Compute target yaw and pitch
+        float targetYaw   = Mathf.Atan2(targetDir.x, targetDir.z) * Mathf.Rad2Deg;
+        float targetPitch = Mathf.Asin(targetDir.y) * Mathf.Rad2Deg;
+
+        // Calculate deltas using shortest angle difference
+        float deltaYaw   = Mathf.DeltaAngle(currentYaw, targetYaw);
+        float deltaPitch = Mathf.DeltaAngle(currentPitch, targetPitch);
+
+        return new Vector2(deltaPitch, deltaYaw); // X = pitch, Y = yaw
+    } 
     
     void UpdatePlayerMovement()
     {
@@ -119,6 +181,7 @@ public class AIInputController : MonoBehaviour
         if (distance > maxGuideDistance)
             SyncGuide();
     }
+    
     void SyncGuide()
     {
         var guide = GetAIGuide();
@@ -133,6 +196,9 @@ public class AIInputController : MonoBehaviour
         else if (!_aiGuide.gameObject.activeInHierarchy)
             _aiGuide.gameObject.SetActive(true);
 
+        if (_aiGuide)
+            _aiGuide.player = _player;
+        
         return _aiGuide;
     }
 

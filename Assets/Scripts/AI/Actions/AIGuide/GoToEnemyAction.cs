@@ -27,11 +27,12 @@ public partial class GoToEnemyAction : Action
         
         if (!navMeshAgent.isActiveAndEnabled)
             return Status.Failure;
-        
+
+        navMeshAgent.isStopped = false;
         navMeshAgent.SetDestination(enemy.transform.position);
 
         LayerMask ignore = (1 << LayerMask.NameToLayer("Player"));
-        if (range.HasLineOfSight(enemy))
+        if (range.HasLineOfSight(enemy, ignore))
         {
             navMeshAgent.isStopped = true;
             navMeshAgent.SetDestination(navMeshAgent.transform.position);

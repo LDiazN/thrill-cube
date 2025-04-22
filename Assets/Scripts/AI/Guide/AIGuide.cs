@@ -2,35 +2,55 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class AIGuide : MonoBehaviour
 {
     #region Inspector Properties
 
     [SerializeField] private float timeBetweenEnemyUpdates = 1;
-    
+    [SerializeField] private RangeDetector walkingDistance;
+    [SerializeField] private RangeDetector shootingDistance;
+    public RangeDetector ShootingDistance => shootingDistance;
+
     #endregion
+    
     #region Internal State
 
     private List<Enemy> _enemies = new();
     private float _timeSinceLastEnemyUpdate;
     [CanBeNull] private Enemy _closestEnemy;
-    
+    private bool _shouldShoot;
+
+    public bool ShouldShoot
+    {
+        get => _shouldShoot;
+        set => _shouldShoot = value;
+    }
+
+    public Player player;
+
     #endregion
     
     #region Components
-    private RangeDetector _rangeDetector;
-    public RangeDetector RangeDetector => _rangeDetector;
+    private NavMeshAgent _agent;
     #endregion
 
     private void Awake()
     {
-        _rangeDetector = GetComponent<RangeDetector>();
+        _agent = GetComponent<NavMeshAgent>();
     }
 
     private void Update()
     {
         UpdateEnemies();
+        UpdateOrientation();
+    }
+
+    private void UpdateOrientation()
+    {
+        if (_agent.velocity.sqrMagnitude > 0.1f)
+            transform.LookAt(transform.position + _agent.velocity.normalized);
     }
 
     private void UpdateClosestEnemy()
@@ -69,7 +89,8 @@ public class AIGuide : MonoBehaviour
         var enemies = FindObjectsByType<Enemy>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         _enemies.Clear();
         foreach (var enemy in enemies)
-            _enemies.Add(enemy);
+            if (!enemy.Health.isDead)
+                _enemies.Add(enemy);
         
         UpdateClosestEnemy();
     }
@@ -79,5 +100,22 @@ public class AIGuide : MonoBehaviour
         // Looks stupid but actually unity is checking if the object is not only null, 
         // but also a valid object in scene
         return _closestEnemy != null ? _closestEnemy : null;
+    }
+
+    public bool EnemyOnSight()
+    {
+        if (!player)
+            return false;
+
+        RaycastHit hit;
+        var hitSomething = Physics.Raycast(player.TPSCamera.GetCameraPosition(), player.TPSCamera.GetCameraDirection(), out hit);
+        if (!hitSomething)
+            return false;
+
+        var enemy = hit.collider.GetComponent<Enemy>();
+        if (!enemy)
+            return false;
+
+        return !enemy.Health.isDead;
     }
 }

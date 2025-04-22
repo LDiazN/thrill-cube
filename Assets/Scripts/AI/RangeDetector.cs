@@ -60,7 +60,8 @@ public class RangeDetector : MonoBehaviour
     public bool HasLineOfSight<T>(T component, LayerMask ignoreMask = new()) where T : MonoBehaviour
     {
         // Check if within range
-        var inRange = Vector3.SqrMagnitude(transform.position - component.transform.position) < range * range;
+        var toComponent = component.transform.position - transform.position;
+        var inRange = toComponent.sqrMagnitude < range * range;
         if (!inRange)
             return false;
         

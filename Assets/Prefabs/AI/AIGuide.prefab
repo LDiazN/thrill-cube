@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 3175690289773769193}
   - component: {fileID: 323071049981354995}
   - component: {fileID: 4467231388082631976}
+  - component: {fileID: 6623981732727927514}
   m_Layer: 0
   m_Name: AIGuide
   m_TagString: Untagged
@@ -146,8 +147,8 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: -334000983
   m_Radius: 0.5
-  m_Speed: 100
-  m_Acceleration: 8
+  m_Speed: 11
+  m_Acceleration: 102.93
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0
@@ -171,6 +172,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeBetweenEnemyUpdates: 1
+  walkingDistance: {fileID: 4467231388082631976}
+  shootingDistance: {fileID: 6623981732727927514}
+  player: {fileID: 0}
 --- !u!135 &3175690289773769193
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -209,6 +213,7 @@ MonoBehaviour:
   - rid: 8090390667898126502
   - rid: 8090390667898126503
   - rid: 8090390667898126612
+  - rid: 8090390691315974164
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -238,6 +243,14 @@ MonoBehaviour:
           m_Value1: 3824306455085664013
         Name: RangeDetector
         m_Value: {fileID: 4467231388082631976}
+    - rid: 8090390691315974164
+      type: {class: 'BlackboardVariable`1[[RangeDetector, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 8661657108184711698
+          m_Value1: 1514878659609571604
+        Name: Shoot Range
+        m_Value: {fileID: 6623981732727927514}
 --- !u!114 &4467231388082631976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,8 +263,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectorName: Shoot
+  detectorName: Close to Enemy
   player: {fileID: 0}
   range: 8.38
   gizmosColor: {r: 1, g: 0, b: 0, a: 1}
+  drawGizmos: 1
+--- !u!114 &6623981732727927514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4678527921457623924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4347c33ad50c5c4392b44b8f5259a1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectorName: Shoot Detector
+  player: {fileID: 0}
+  range: 15.87
+  gizmosColor: {r: 0.890478, g: 1, b: 0, a: 1}
   drawGizmos: 1
