@@ -117,20 +117,6 @@ public class AIInputController : MonoBehaviour
         
         // Compute the rotation required to get to the desired direction
         var change = GetXYRotToAlign(currentDir, desiredDir);
-
-        var current = (Vector2) transform.rotation.eulerAngles;
-        var desired = current + change;
-        
-        // Damping helps to prevent flickering 
-        var xRotation = Mathf.SmoothDampAngle(current.x, desired.x, ref _rotationSpeedX, 0.1f);
-        var yRotation = Mathf.SmoothDampAngle(current.y, desired.y, ref _rotationSpeedY, 0.1f);
-        
-        // The input is intended for mouse so it's based on offsets
-        var xOffset = xRotation - current.x;
-        var yOffset = yRotation - current.y;
-
-        xOffset *= 10;
-        yOffset *= 10;
         
         // This is inverted bc in a mouse horizontal movement rotates around the Y axis, while vertical movement
         // rotates the X axis 

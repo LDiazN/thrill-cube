@@ -416,7 +416,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aiGuidePrefab: {fileID: 4080725986069529123, guid: fa82ad560c862a349ae91588a0314c3e, type: 3}
-  _maxGuideDistance: 3
+  maxGuideDistance: 3
+  desiredDistanceToGuide: 2
 --- !u!1 &1392923092237794166
 GameObject:
   m_ObjectHideFlags: 0

@@ -59,12 +59,23 @@ public class AIGuide : MonoBehaviour
         Enemy closestEnemy = null;
         foreach (var enemy in _enemies)
         {
-            var toEnemy = enemy.transform.position - transform.position;
-            var distance = toEnemy.magnitude;
-            if (distance < minDistance)
+            var path = new NavMeshPath();
+            var position = enemy.transform.position;
+            // Make sure is in the same level as the player to ensure the path is valid 
+            // Some enemies might have the pivot point in a higher position
+            position.y = transform.position.y;
+            if (_agent.CalculatePath(position, path) && path.status == NavMeshPathStatus.PathComplete)
             {
-                closestEnemy = enemy;
-                minDistance = distance;
+                // Compute distance by navigation, not just euclidian distance
+                float distance = 0;
+                for (int i = 1; i < path.corners.Length; i++)
+                    distance += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+                
+                if (distance < minDistance)
+                {
+                    closestEnemy = enemy;
+                    minDistance = distance;
+                }
             }
         }
 
