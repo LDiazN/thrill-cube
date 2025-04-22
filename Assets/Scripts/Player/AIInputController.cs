@@ -34,9 +34,6 @@ public class AIInputController : MonoBehaviour
     private bool _callbacksRegistered = false;
     [CanBeNull] private AIGuide _aiGuide;
 
-    private float _rotationSpeedX = 0;
-    private float _rotationSpeedY = 0;
-
     #endregion
     private void Awake()
     {
