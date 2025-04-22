@@ -49,5 +49,7 @@ MonoBehaviour:
   shootingEnemyScene: TestingShooterEnemy
   mainMenuScene: MainMenu
   bspDemoScene: BSPDemo
-  bspGameScene: BSPGame
+  bspGameScene: ProcGenLobby
   deathWallScene: DeathWallScene
+  autopilotGhostScene: TestingAutopilot
+  autopilotSampleScene: GameSceneWithAutoPilot

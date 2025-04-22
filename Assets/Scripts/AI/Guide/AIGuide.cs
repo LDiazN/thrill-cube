@@ -57,13 +57,22 @@ public class AIGuide : MonoBehaviour
     {
         var minDistance = Mathf.Infinity;
         Enemy closestEnemy = null;
+        // Find the height of the floor
+        RaycastHit hit;
+        Vector3 floorPos;
+        if (Physics.Raycast(transform.position + transform.forward, Vector3.down, out hit))
+            floorPos = hit.point;
+        else
+            floorPos = transform.position;
+        
         foreach (var enemy in _enemies)
         {
             var path = new NavMeshPath();
             var position = enemy.transform.position;
             // Make sure is in the same level as the player to ensure the path is valid 
             // Some enemies might have the pivot point in a higher position
-            position.y = transform.position.y;
+            position.y = floorPos.y;
+            
             if (_agent.CalculatePath(position, path) && path.status == NavMeshPathStatus.PathComplete)
             {
                 // Compute distance by navigation, not just euclidian distance

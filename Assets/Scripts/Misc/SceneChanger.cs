@@ -13,6 +13,8 @@ public class SceneChanger : MonoBehaviour
     [SerializeField] string bspDemoScene;
     [SerializeField] string bspGameScene;
     [SerializeField] string deathWallScene; // Actually points to the lobby for that scene
+    [SerializeField] string autopilotGhostScene; 
+    [SerializeField] string autopilotSampleScene; 
     #endregion 
     
     #region Internal State
@@ -72,5 +74,15 @@ public class SceneChanger : MonoBehaviour
     public void GoToDeathWall()
     {
         GoScene(deathWallScene);
+    }
+
+    public void GoToAutopilotVisibleGhost()
+    {
+        GoScene(autopilotGhostScene);
+    }
+
+    public void GoToSampleSceneAutopilot()
+    {
+        GoScene(autopilotSampleScene);
     }
 }
