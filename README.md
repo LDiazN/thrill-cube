@@ -121,7 +121,7 @@ void ConnectRooms(PartitionTree tree) {
 ```
 
 - `IsNeighbor` returns true when two partitions share a side
-- `Connect` sets up a hallway between `child_1` and `child_2`
+- `Connect` sets up a hallway between `child_1` and `child_2`. It chooses randomly a position within the shared edge while respecting W, P and H 
 - `GetChildren` returns a list with all the leaves of a given `PartitionTree`
 
 Note that to optimize `GetChildren` I used a DFS traversal algorithm to set up the start and finish time for each node, so that checking if a node is parent of another node is as efficient as: 
@@ -158,16 +158,43 @@ With this in mind, populating a room works as follows:
 If there's not enough space to place an object, the object is skipped. Pickable guns and throwable weapons do not take space, so they can always be placed.
 
 
-
-
-
 | ![ExampleRoomEmpty](https://github.com/user-attachments/assets/51a298f4-e4ab-459a-88ef-8253aa7bc3aa) |![ExampleRoomProps](https://github.com/user-attachments/assets/fc69918f-56d5-4ac7-a846-b36bd8e5fa10) | ![ExampleRoomEnemies](https://github.com/user-attachments/assets/368eb8ac-3abb-412c-996d-9672e8204b76) | ![ExampleRoomFull](https://github.com/user-attachments/assets/341b3694-97d8-4ac8-b763-3a80028e872d) |
 |:--:|:--:|:--:|:--:|
 | Empty room, only the player start is placed | Static props added | Enemies Added | Pickables and weapons added |
 
 You can test the level generation in the **"BSP Demo"** scene.
 
-The **"Random Rooms Level"** has a playable game where you spawn in a randomly generated level with enemies you have to kill to win the game. Props are removed from this scene because they are annoying during the gameplay, rooms are also bigger and lesser to encourage fighting and reduce exploration.
+The **"Random Rooms Level"** scene is a playable level where you spawn in a randomly generated level with enemies you have to kill to win the game. Props are removed from this scene because they are annoying during the gameplay, rooms are also bigger and lesser to encourage fighting and reduce the need for exploration.
+
+## Autopilot 
+
+| ![ExampleImmortal - Trim](https://github.com/user-attachments/assets/ca5a6e89-085e-40b8-ba94-b7207911bdeb) |
+|:--:|
+| _Don't mess with the cube_ |
+
+The player can give control to the AI at any moment by pressing the **tab** key. This will start the autopilot mode that tries to kill every enemy in the level automatically. You can also press **tab** again to regain control of the character. 
+
+The AI mode is indicated by the blinking blue text at the top left corner of the screen: "AI control active".
+
+I also wanted to avoid turning the player character into an NPC while in AI mode. I was looking for an approach that could emulate human input. My solution was using
+a "ghost", and invisible and intangible object that would implement the actual AI, and a translator in the playable character that would translate its behavior to user input. 
+The result looked something like this: 
+
+![ExampleWithGhost](https://github.com/user-attachments/assets/02f15910-3f92-47bc-97ac-3b5ceb9cf572)
+
+- The purple transparent cube is the "ghost" that implements the actual AI behavior
+- When the player activates the AI control, user input is deactivated in the character and another components proceeds to translate the ghost's behavior to user input.
+   - If the ghost goes forward, it translates it to the user pressing the forward button ("W")
+   - If the robot decides that it wants to shoot an enemy, the translator computes the required horizontal and vertical axis to center the crosshair in the enemy and shoot only when it's sure that it will hit
+
+This approach has its drawbacks. For example, since the player is essentially "following" the ghost, it can get bugged on corners or act on the wrong information (the ghost has line of sight with the enemy but the player doesn't, for example). To mitigate these problems I reset the position of the ghost to the position of the player if they split appart too much. 
+
+The AI for the player is very simple, it's based on the idea that an human player is usually doing two things at the same time when playing this type of game: 
+1. **Moving**: Avoiding dangers and chasing enemies
+2. **Shooting:** Aiming towards enemies and shooting at the right moment.
+
+Of course, the reality is more complex and these activities are closely related to each other, but I used it as an useful approximation.
+
 
 
 
