@@ -1,5 +1,7 @@
 # Cube With a Gun
-![imagen](https://github.com/user-attachments/assets/844c1111-5b72-40d1-a52e-bb78ab3bdecd)
+
+![CubeWithAGunMenu](https://github.com/user-attachments/assets/2cb3a74e-514e-4b08-951e-6e898a96999f)
+
 
 This is a sample project I made with **Unity 6** to explore AI programming and procedural generation in Unity. It's a simple **third person arena shooter** implementing the following mechanics:
 
