@@ -136,7 +136,7 @@ These are the parameters that depend on the area size. Most of these parameters 
 With this in mind, populating a room works as follows:  
 1. Find the smallest room by area and choose it as player start and reserve space for the player. No enemies can spawn in this room.
 2. Populate enemies in this room according to parameters
-3. Populate guns according to parameters. Always choose the max between amount of shooters and amount of pickable guns, to ensure that there's always at the least one gun per melee enemy.
+3. Populate guns according to parameters. Always choose the max between amount of melees and amount of pickable guns, to ensure that there's always at the least one gun per melee enemy.
 4. Populate throwable weapons
 
 If there's not enough space to place an object, the object is skipped. Pickable guns and throwable weapons do not take space, so they can always be placed.
