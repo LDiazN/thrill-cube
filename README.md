@@ -226,6 +226,7 @@ If we consider that the change in position between frames is always small, then 
 
 Remember to press **tab** to start the autopilot mode. You can press it again to regain control. 
 
+![ExampleImmortal - Short(1)](https://github.com/user-attachments/assets/916b2f78-e1d9-4850-89c0-000ec2498219)
 
 
 
