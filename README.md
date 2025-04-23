@@ -12,14 +12,19 @@ This is a sample project I made with **Unity 6** to explore AI programming and p
 3. **Automatic Gameplay**: The player has an AI mode that you can activate at any time so that the game plays itself. Rather than converting the player in an NPC, this mode actually simulates user input. This is useful to design bots for multiplayer games or automatic testing  
 
 ## Table of contents
-- [Unity Version and dependencies](#unity-version-and-dependencies)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [License](#license)
+- [Unity version and dependencies](#unity-version-and-dependencies)
+- [Levels](#levels)
+- [Basic AI: Behavior Trees](#basic-ai-behavior-trees)
+  - [Melee Enemy](#melee-enemy)
+  - [Shooter Enemy](#shooter-enemy)
+  - [Knowledge Areas](#knowledge-areas)
+- [Procedural level generation](#procedural-level-generation)
+  - [Parameters](#parameters)
+  - [Algorithm](#algorithm)
+- [Autopilot](#autopilot)
 
 --- 
-## Unity Version and dependencies
+## Unity version and dependencies
 Unity 6 (6000.0.40f1)
 
 This project requires the following packages: 
