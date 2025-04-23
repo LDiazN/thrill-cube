@@ -7,7 +7,7 @@ This is a sample project I made with **Unity 6** to explore AI programming and p
     - **Shooter Enemy**: Shoots to you from far away and dies fast
     - **Melee Enemy**: Charges against you and it's hard to kill
 2. **Procedural level generation:** Implemented using the BSP algorithm, I wanted to generate random rooms with enemies that resemble office floors, and the [BSP algorithm](https://en.wikipedia.org/wiki/Binary_space_partitioning) makes this really easy
-3. **Automatic Gameplay**: The player has an AI mode that you can activate so that the game plays itself. Rather than converting the player in an NPC, this mode actually simulated user input. This is useful to design bots for multiplayer games or automatic testing  
+3. **Automatic Gameplay**: The player has an AI mode that you can activate so that the game plays itself. Rather than converting the player in an NPC, this mode actually simulates user input. This is useful to design bots for multiplayer games or automatic testing  
 
 --- 
 ## Unity Version and dependencies
