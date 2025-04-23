@@ -59,4 +59,23 @@ so you don't have to manually assign the area to each enemy.
 This is useful to implement behaviors like "detect when someone is attacking a nearby ally". This demo provides a sample level that showcases this feature: 
 
 ![KnowledgeAreaTest](https://github.com/user-attachments/assets/5b969197-fa99-43c2-a10e-e1f7e74e3387)
+--- 
+
+## Procedural level generation
+I wanted to go for an office floor type of level, where the space is a rectangular shape partitioned into rooms. This is an easy use case for the BSP algorithm. My implementation goes like this: 
+
+### Parameters
+- S: Min side size of each room. No room can have a side smaller than S
+- P: Padding, it's a margin between the room limits and the area where you can generate content
+- W: Wall thickness, how thick are the walls
+
+### Algorithm
+The first stage is the **space partition:**
+1. Take a squared area in the space
+2. Choose a cutting point at random, either vertically or horizontally, respecting that each half should be at the least of length S. If no such cut is possible, finish here
+3. Set these two halves as children of this area, creating a binary tree
+4. Repeat from 1. for both of the current area's children
+
+This process will generate a binary tree of space partitions, where the actual rooms are defined by the leaves in this tree. 
+
 
