@@ -21,7 +21,7 @@ This project requires the following packages:
 4. Cinemachine
 5. Behavior
 
-## Behavior Trees
+## Basic AI: Behavior Trees
 These are the behavior trees implemented for each enemy: 
 ### Melee Enemy
 ![imagen](https://github.com/user-attachments/assets/96c2d954-7434-454a-b1ba-f11120e4c124)
@@ -50,7 +50,7 @@ This enemy has two states: **patrolling and attacking**
     1. The enemy tries to close distance with the player
     2. Once in proper distance, it looks towards the player 
     3. Then it shoots and waits for the recoil before attacking again
-## Knowledge Areas 
+### Knowledge Areas 
 
 Enemies can belong to a knowledge area in the map to report the player to other enemies within the same area. 
 This area is basically a **trigger collider** with data that it's considered shared between all enemies within this area. Enemies are registered and deregistered from this area when they enter and exit, 
