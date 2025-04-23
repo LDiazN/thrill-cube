@@ -23,6 +23,17 @@ This project requires the following packages:
 4. Cinemachine
 5. Behavior
 
+## Levels
+
+The main build profile provides the following levels: 
+1. **Sample Level**: A simple level showcasing the fundamental game features and AI behavior. You have to kill all enemies to win 
+2. **Random Rooms Level**: Same as the previous level, but this time rooms are auto generated every time the level loads. You have to kill every enemy to win the level and it provides more complex features like ammunition and throwable weapons.
+3. **Knowledge Sharing Level**: A simple level showcasing the knowledge area feature for enemies
+4. **BSP Demo**: A simple scene where you can play with the level generation system. You can change some parameters and inspect the generated level.
+5. **Shooter Enemy Level:** A simple level to test the shooter enemy AI
+6. **Autopilot Ghost example:** A simple scene used to test the autopilot feature. Press **tab** to give control to the AI. In this scene you can actually see the "ghost" that is controlling the AI behavior
+7. **Sample Level (autopilot enabled):** The same as the sample level but is properly set up to allow the AI autopilot to work 
+
 ## Basic AI: Behavior Trees
 These are the behavior trees implemented for each enemy: 
 ### Melee Enemy
@@ -64,6 +75,9 @@ This is useful to implement behaviors like "detect when someone is attacking a n
 --- 
 
 ## Procedural level generation
+![ExampleFastGeneration](https://github.com/user-attachments/assets/721bcbc0-137c-4d1b-bc19-212b7e7f8f76)
+
+
 I wanted to go for an office floor type of level, where the space is a rectangular shape partitioned into rooms. This is an easy use case for the BSP algorithm. My implementation goes like this: 
 
 ### Parameters
@@ -142,6 +156,20 @@ With this in mind, populating a room works as follows:
 4. Populate throwable weapons
 
 If there's not enough space to place an object, the object is skipped. Pickable guns and throwable weapons do not take space, so they can always be placed.
+
+
+
+
+
+| ![ExampleRoomEmpty](https://github.com/user-attachments/assets/51a298f4-e4ab-459a-88ef-8253aa7bc3aa) |![ExampleRoomProps](https://github.com/user-attachments/assets/fc69918f-56d5-4ac7-a846-b36bd8e5fa10) | ![ExampleRoomEnemies](https://github.com/user-attachments/assets/368eb8ac-3abb-412c-996d-9672e8204b76) | ![ExampleRoomFull](https://github.com/user-attachments/assets/341b3694-97d8-4ac8-b763-3a80028e872d) |
+|:--:|:--:|:--:|:--:|
+| Empty room, only the player start is placed | Static props added | Enemies Added | Pickables and weapons added |
+
+You can test the level generation in the **"BSP Demo"** scene.
+
+The **"Random Rooms Level"** has a playable game where you spawn in a randomly generated level with enemies you have to kill to win the game. Props are removed from this scene because they are annoying during the gameplay, rooms are also bigger and lesser to encourage fighting and reduce exploration.
+
+
 
 
       
