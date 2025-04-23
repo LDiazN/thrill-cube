@@ -11,6 +11,13 @@ This is a sample project I made with **Unity 6** to explore AI programming and p
 2. **Procedural level generation:** Implemented using the BSP algorithm, I wanted to generate random rooms with enemies that resemble office floors, and the [BSP algorithm](https://en.wikipedia.org/wiki/Binary_space_partitioning) makes this really easy
 3. **Automatic Gameplay**: The player has an AI mode that you can activate at any time so that the game plays itself. Rather than converting the player in an NPC, this mode actually simulates user input. This is useful to design bots for multiplayer games or automatic testing  
 
+## Table of contents
+- [Unity Version and dependencies](#unity-version-and-dependencies)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [License](#license)
+
 --- 
 ## Unity Version and dependencies
 Unity 6 (6000.0.40f1)
@@ -185,16 +192,34 @@ The result looked something like this:
 - The purple transparent cube is the "ghost" that implements the actual AI behavior
 - When the player activates the AI control, user input is deactivated in the character and another components proceeds to translate the ghost's behavior to user input.
    - If the ghost goes forward, it translates it to the user pressing the forward button ("W")
-   - If the robot decides that it wants to shoot an enemy, the translator computes the required horizontal and vertical axis to center the crosshair in the enemy and shoot only when it's sure that it will hit
+   - If the robot decides that it wants to shoot an enemy, the translator computes the required horizontal and vertical mouse input to center the crosshair in the enemy and shoot only when it's sure that it will hit
 
-This approach has its drawbacks. For example, since the player is essentially "following" the ghost, it can get bugged on corners or act on the wrong information (the ghost has line of sight with the enemy but the player doesn't, for example). To mitigate these problems I reset the position of the ghost to the position of the player if they split appart too much. 
+This approach has its drawbacks. For example, since the player is "following" the ghost, it can get bugged on corners or act on the wrong information (the ghost has line of sight with the enemy but the player doesn't, for example). To mitigate these problems I reset the position of the ghost to the position of the player if they split appart too much. 
 
-The AI for the player is very simple, it's based on the idea that an human player is usually doing two things at the same time when playing this type of game: 
+The AI itself is very simple, it's based on the idea that an human player is usually doing two things at the same time when playing this type of game: 
 1. **Moving**: Avoiding dangers and chasing enemies
 2. **Shooting:** Aiming towards enemies and shooting at the right moment.
 
 Of course, the reality is more complex and these activities are closely related to each other, but I used it as an useful approximation.
 
+This approach led to the following behavior tree: 
+
+![imagen](https://github.com/user-attachments/assets/24d05b5d-2ea8-40d3-ac6c-41cac6bae1a7)
+
+- It's always running two behaviors at the same time: Chase and shoot.
+- Chase will choose the closest enemy (by nav mesh path length) and make the ghost navigate to a position close enough to shoot.
+- Shoot will continously try to aim and shoot to the closest enemy
+
+Unfortunately I didn't have the time to make a more complex movement behavior, so the player won't try to avoid dangers or look for another weapon if it runs out of ammo. But nevertheless it's still very interesting as it is. 
+
+I mentioned that the closest enemy is chosen by **nav mesh path length instead of euclidian distance**. This is important because it prevents the player from prioritizing enemies in a neighbor room with a wall in the middle. But this is an expensive calculation, how do we do it without tanking the frame rate?
+
+If we consider that the change in position between frames is always small, then it's not necessary to actually run it every frame. Instead, I compute the closest enemy **twice per second** and cache the result. The enemy is not always in sync but is beliavable enough.   
+
+- The **Sample Level (autopilot enabled)** scene has an inmortal player with a gun with infinite ammo. It's intended to showcase the autopilot.
+- The **Autopilot ghost example** scene has a visible ghost to show how the player follows its movements.
+
+Remember to press **tab** to start the autopilot mode. You can press it again to regain control. 
 
 
 
