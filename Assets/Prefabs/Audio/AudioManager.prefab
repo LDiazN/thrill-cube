@@ -46,3 +46,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAudioSource: {fileID: 0}
   audioSourcePrefab: {fileID: 4885490554931462257, guid: 988934df5a74a2f4a804bc89bea445d4, type: 3}
+  playerSFXSource: {fileID: 4885490554931462257, guid: 988934df5a74a2f4a804bc89bea445d4, type: 3}

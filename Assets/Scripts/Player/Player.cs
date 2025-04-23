@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.ComponentModel;
 using UnityEngine;
 
@@ -9,6 +10,13 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     #region Inspector properties
+
+    [Header("Controller")] 
+    [SerializeField]
+    private PlayerInputController _playerInputController;
+    [SerializeField]
+    private AIInputController _aiInputController;
+    
     [Header("Audio")]
     [Description("Played when hurt")]
     [SerializeField] private AudioClip[] hurtClips;
@@ -44,6 +52,22 @@ public class Player : MonoBehaviour
     public ThirdPersonCamera TPSCamera => _tpsCamera;
 
     #endregion
+    
+    #region Events
+
+    public event Action<bool> OnPlayerControllerChanged;
+    
+    #endregion
+    
+    #region Internal State
+
+    private bool _usingAI = false;
+    /// <summary>
+    /// If the player is currently being controlled by an AI
+    /// </summary>
+    public bool UsingAI => _usingAI;
+    
+    #endregion
 
     private void Awake()
     {
@@ -54,6 +78,9 @@ public class Player : MonoBehaviour
         _playerMovement = GetComponent<PlayerMovement>();
         _equipment = GetComponent<Equipment>();
         _tpsCamera = GetComponent<ThirdPersonCamera>();
+
+        _aiInputController = GetComponent<AIInputController>();
+        _playerInputController = GetComponent<PlayerInputController>();
         
         if(!playerAudioSource)
             Debug.LogWarning("No player audio source set up in inspector!");
@@ -69,10 +96,6 @@ public class Player : MonoBehaviour
         _health.OnHealthChanged -= HealthChanged;
     }
 
-    private void Start()
-    {
-    }
-
     // Deactivates player input, doesn't matter if it's AI or human
     public void DeactivateInput()
     {
@@ -84,5 +107,39 @@ public class Player : MonoBehaviour
     {
         if (change.IsDamage) 
             AudioManager.PlayAudioAtPosition(transform.position, hurtClips);
+    }
+
+    public void ChangeToAI(bool useAI)
+    {
+        if (useAI == UsingAI)
+            return;
+        
+        // I don't know why this is needed but for some reason 
+        // components are killed before reaching this code, triggering an 
+        // use-after-free exception
+        _playerInputController = GetComponent<PlayerInputController>();
+        _aiInputController = GetComponent<AIInputController>();
+
+        _usingAI = useAI;
+        _aiInputController.enabled = useAI;
+        _playerInputController.enabled = !useAI;
+        
+        OnPlayerControllerChanged?.Invoke(UsingAI);
+    }
+
+    public void TryAttack()
+    {
+        if (Equipment.currentGun)
+            Shoot.Fire();
+        else if (Equipment.currenThrowable)
+            Throw.ThrowEquipment();
+        else if (!Equipment.HasEquipment)
+            TryPick();
+    }
+    
+    public void TryPick()
+    {
+       if (!Equipment.TryEquipFromPicker())
+           Equipment.TryEquipFromFloor();
     }
 }

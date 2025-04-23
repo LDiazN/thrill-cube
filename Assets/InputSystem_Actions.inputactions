@@ -112,6 +112,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ChangeAI",
+                    "type": "Button",
+                    "id": "ce3072cf-623b-4919-a9a3-b6992a78d1c0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -563,6 +572,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse;Gamepad",
                     "action": "SecondaryAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "42b5fecb-d33b-4fa7-adaa-2bfe98df2dd0",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse;Gamepad;Touch;Joystick;XR",
+                    "action": "ChangeAI",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

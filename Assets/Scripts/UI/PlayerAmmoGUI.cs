@@ -38,17 +38,23 @@ public class PlayerAmmoGUI : MonoBehaviour
     
     private void Start()
     {
-        // Init Health Value
-        if (player)
-        {
-            SetupCallbacks();
-            Init();
-        }
+        SetPlayer(player);
     }
 
     private void OnDisable()
     {
         ClearCallbacks();
+    }
+
+    public void SetPlayer(Player newPlayer)
+    {
+        // Init Health Value
+        if (newPlayer)
+        {
+            player = newPlayer;
+            SetupCallbacks();
+            Init();
+        }
     }
 
     void UpdateAmmoCount()
@@ -89,6 +95,9 @@ public class PlayerAmmoGUI : MonoBehaviour
     {
         if (!player)
             return;
+
+        if (!player.Equipment)
+            return;
         
         player.Equipment.OnEquip += OnEquipmentChanged;
         player.Equipment.OnUnequip += OnUnequip;
@@ -100,7 +109,7 @@ public class PlayerAmmoGUI : MonoBehaviour
 
     void ClearCallbacks()
     {
-        if (!player)
+        if (!player || !player.Equipment)
             return;
         
         player.Equipment.OnEquip -= OnEquipmentChanged;
@@ -109,8 +118,12 @@ public class PlayerAmmoGUI : MonoBehaviour
 
     private void Init()
     {
-        if (player)
-            _gun = player.Equipment.currentGun;
+        if (!player)
+            return;
+        if (!player.Equipment)
+            return;
+        
+        _gun = player.Equipment.currentGun;
 
         foreach (Transform child in transform)
         {

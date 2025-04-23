@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 2438282808253184924}
   - component: {fileID: 4602451099656517878}
   - component: {fileID: 8500137306815255148}
+  - component: {fileID: 8737452773648940128}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -235,6 +236,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7679be0dcc30a943a681ba1c58aac46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputController: {fileID: 0}
+  _aiInputController: {fileID: 0}
   hurtClips:
   - {fileID: 8300000, guid: 9072e89aa4ebf2746a9784708efad3d1, type: 3}
   playerAudioSource: {fileID: 0}
@@ -384,7 +387,8 @@ MonoBehaviour:
   throwForce: 0
   currentGun: {fileID: 7316304808308389308}
   currenThrowable: {fileID: 3555314590385713686}
-  CanPick: {fileID: 0}
+  canPickFromPicker: {fileID: 0}
+  canPickFromFloor: {fileID: 0}
 --- !u!114 &8500137306815255148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -399,6 +403,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   equipmentSlot: {fileID: 455668174758758955}
   throwForce: 100
+--- !u!114 &8737452773648940128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316184727601047487}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14a0b05526268bc40b178cda8ed9707f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aiGuidePrefab: {fileID: 4080725986069529123, guid: fa82ad560c862a349ae91588a0314c3e, type: 3}
+  maxGuideDistance: 3
+  desiredDistanceToGuide: 2
 --- !u!1 &1392923092237794166
 GameObject:
   m_ObjectHideFlags: 0

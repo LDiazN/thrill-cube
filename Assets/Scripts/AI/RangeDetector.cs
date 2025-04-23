@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -34,14 +33,12 @@ public class RangeDetector : MonoBehaviour
     private void Awake()
     {
         if (player == null)
-        {
-            player = FindFirstObjectByType<Player>();
-        }
+            player = FindFirstObjectByType<Player>(FindObjectsInactive.Include);
     }
 
     public bool IsPlayerInRange()
     {
-        if (player == null)
+        if (!player)
             return false;
 
         // Check if within range
@@ -58,6 +55,25 @@ public class RangeDetector : MonoBehaviour
         // Check if what we hit was the player
         var playerComponent = hit.collider.GetComponent<Player>();
         return playerComponent != null;
+    }
+
+    public bool HasLineOfSight<T>(T component, LayerMask ignoreMask = new()) where T : MonoBehaviour
+    {
+        // Check if within range
+        var toComponent = component.transform.position - transform.position;
+        var inRange = toComponent.sqrMagnitude < range * range;
+        if (!inRange)
+            return false;
+        
+        // Check if visible
+        var toGameObject = component.transform.position - transform.position;
+        var hitSomething = Physics.Raycast(transform.position, toGameObject.normalized, out RaycastHit hit, range, ~ignoreMask);
+        if (!hitSomething)
+            return false;
+        
+        // Check if what we hit was the object
+        var actualComponent = hit.collider.GetComponent<T>();
+        return  actualComponent != null;
     }
 
     private void OnDrawGizmos()
