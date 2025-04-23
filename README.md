@@ -1,14 +1,13 @@
 # Cube With a Gun
 ![imagen](https://github.com/user-attachments/assets/844c1111-5b72-40d1-a52e-bb78ab3bdecd)
 
-This is a sample project I made with **Unity 6** to explore AI programming in Unity. It's a simple **third person arena shooter** with basic AI functionality.
+This is a sample project I made with **Unity 6** to explore AI programming and procedural generation in Unity. It's a simple **third person arena shooter** implementing the following mechanics:
 
-There are two basic enemies in this game: 
-- **Shooter Enemy**: Shoots to you from far away and dies fast
-- **Melee Enemy**: Charges against you and it's hard to kill
-
-The AI is mostly implemented using [Unity 6's Behavior package](https://docs.unity3d.com/Packages/com.unity.behavior@1.0/manual/index.html). The behavior tree controls the state changing logic while the 
-actual behavior is implemented with custom action nodes. 
+1. **Basic AI** implemented with behavior trees, using [Unity 6's Behavior package](https://docs.unity3d.com/Packages/com.unity.behavior@1.0/manual/index.html). The behavior tree controls the state changing logic while the actual behavior is implemented with custom action nodes. There are two basic enemies in this game: 
+    - **Shooter Enemy**: Shoots to you from far away and dies fast
+    - **Melee Enemy**: Charges against you and it's hard to kill
+2. **Procedural level generation:** Implemented using the BSP algorithm, I wanted to generate random rooms with enemies that resemble office floors, and the [BSP algorithm](https://en.wikipedia.org/wiki/Binary_space_partitioning) makes this really easy
+3. **Automatic Gameplay**: The player has an AI mode that you can activate so that the game plays itself. Rather than converting the player in an NPC, this mode actually simulated user input. This is useful to design bots for multiplayer games or automatic testing  
 
 --- 
 ## Unity Version and dependencies
