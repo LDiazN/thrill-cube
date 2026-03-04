@@ -3,7 +3,7 @@
 ![CubeWithAGunMenu](https://github.com/user-attachments/assets/2cb3a74e-514e-4b08-951e-6e898a96999f)
 
 
-This is a sample project I made with **Unity 6** to explore AI programming and procedural generation in Unity. It's a simple **third person arena shooter** implementing the following mechanics:
+This is a sample project I made with **Unity 6** to explore AI programming and procedural generation in Unity, I implemented this for my Master's degree on video game design and development. It's a simple **third person arena shooter** implementing the following mechanics:
 
 1. **Basic AI** implemented with behavior trees, using [Unity 6's Behavior package](https://docs.unity3d.com/Packages/com.unity.behavior@1.0/manual/index.html). The behavior tree controls the state changing logic while the actual behavior is implemented with custom action nodes. There are two basic enemies in this game: 
     - **Shooter Enemy**: Shoots to you from far away and dies fast
